@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <% if (cssUrl) { %>
+    <link rel="stylesheet" type="text/css" href="<%= cssUrl %>" />
+    <% } else { %> 
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <% } %>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p class="sample">
+      Welcome to server-side rendering with Node.js on AWS Lambda!
+    </p>
+  </body>
+</html>

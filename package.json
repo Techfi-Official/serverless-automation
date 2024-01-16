@@ -1,0 +1,19 @@
+{
+  "name": "ssr-node-lambda",
+  "version": "1.0.0",
+  "description": "Server-side rendering with Node.js on AWS Lambda",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "zip": "sh ./zip_files.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1536.0",
+    "aws-serverless-express": "^3.4.0",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  }
+}
