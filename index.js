@@ -31,7 +31,7 @@ app.post("/new-tweet", async (req, res) => {
     res.status(400).send("Invalid Request");
   } else {
     try {
-      const response = await axios.post("https://cloud.activepieces.com/api/v1/webhooks/lZt8qkkbgyKUXZQ6qCUzK",
+      const response = await axios.post(process.env.API_URL,
         JSON.stringify(tweetInstructions), 
       {
         headers: {
