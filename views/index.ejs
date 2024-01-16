@@ -1,17 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <% if (cssUrl) { %>
-    <link rel="stylesheet" type="text/css" href="<%= cssUrl %>" />
-    <% } else { %> 
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    <% } %>
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p class="sample">
-      Welcome to server-side rendering with Node.js on AWS Lambda!
-    </p>
-  </body>
+<head>
+    <title>Tweet Edit Wizard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Tweet Editing Wizard</h1>
+        <!-- Add spacing between h2 and h3 -->
+        <br>
+        <h3>Last Generated Tweet</h3>
+        <!-- Show generated tweet bootstrap -->
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text" id="previous_tweet"><%= tweet %></p>
+            </div>
+        </div>
+        <br>
+        <br>
+        <form action="/new-tweet" method="post">
+            <h3>Change ChatGPT Instructions</h3>
+            <!-- Text Input for Text Creation Prompt -->
+            <div class="form-group">
+                <label for="instructions">Text Description Prompt</label>
+                <textarea name="instructions" class="form-control" id="instructions" rows="3" placeholder="Enter your text here"></textarea>
+            </div>
+            <input name="previous_tweet" type="hidden" id="previous_tweet" value="<%= tweet %>">
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" onclick="handleSubmit()">Submit to AI</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS and its dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
 </html>
