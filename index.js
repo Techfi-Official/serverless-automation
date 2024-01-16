@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-const fetch = require("node-fetch-commonjs");
+const axios = require("axios");
 
 const PORT = process.env.PORT || 3000;
 // Set the view engine to EJS for templating
@@ -23,7 +23,6 @@ app.get("/", (req, res) => {
 });
 
 app.post("/new-tweet", async (req, res) => {
-  console.log("api", process.env.API_URL);
   const tweetInstructions = req.body || null;
   console.log(`tweetInstructions`, tweetInstructions);
   //write fetch function to post tweet
@@ -32,17 +31,19 @@ app.post("/new-tweet", async (req, res) => {
     res.status(400).send("Invalid Request");
   } else {
     try {
-      await fetch(process.env.API_URL, {
-        method: "POST",
+      const response = await axios.post("https://cloud.activepieces.com/api/v1/webhooks/lZt8qkkbgyKUXZQ6qCUzK",
+        JSON.stringify(tweetInstructions), 
+      {
         headers: {
           "Content-Type": "application/json",
-        },
-        body: tweetInstructions.tweetInstructions,
+        }
       });
       return res.status(201).send(
         "<h3>Message sent successfully please check your Email Address</h3>"
       );
     } catch (error) {
+      console.log(`error`, error)
+      console.log(tweetInstructions)
         res.status(500).send("Something went wrong, please contact to <b>techfi1992@gmail.com</b>");
     }
   }
