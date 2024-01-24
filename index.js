@@ -14,14 +14,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Main route
 app.get("/", (req, res) => {
-  const tweet = req.query.tweet || null;
-  console.log(`tweet`, tweet);
+  const tweet = req.query.tweet
   res.render("index", {
     title: "Server-Side Rendered Page on AWS Lambda",
-    tweet: tweet,
+    tweet: tweet ?? "N/A",
   });
 });
-
 app.post("/new-tweet", async (req, res) => {
   const tweetInstructions = req.body || null;
   console.log(`tweetInstructions`, tweetInstructions);
@@ -31,20 +29,28 @@ app.post("/new-tweet", async (req, res) => {
     res.status(400).send("Invalid Request");
   } else {
     try {
-      const response = await axios.post(process.env.API_URL,
-        JSON.stringify(tweetInstructions), 
-      {
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.post(
+        process.env.API_URL,
+        JSON.stringify(tweetInstructions),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
-      return res.status(201).send(
-        "<h3>Message sent successfully please check your Email Address</h3>"
       );
+      return res
+        .status(201)
+        .send(
+          "<h3>Message sent successfully please check your Email Address</h3>"
+        );
     } catch (error) {
-      console.log(`error`, error)
-      console.log(tweetInstructions)
-        res.status(500).send("Something went wrong, please contact to <b>techfi1992@gmail.com</b>");
+      console.log(`error`, error);
+      console.log(tweetInstructions);
+      res
+        .status(500)
+        .send(
+          "Something went wrong, please contact to <b>techfi1992@gmail.com</b>"
+        );
     }
   }
 });
