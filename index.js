@@ -55,6 +55,41 @@ app.post("/new-tweet", async (req, res) => {
   }
 });
 
+app.post("/edit-tweet", async (req, res) => {
+  const newTweet = req.body || null;
+  console.log(`newTweet`, newTweet);
+  //write fetch function to post tweet
+  // if newTweet is null, return error
+  if (!newTweet) {
+    res.status(400).send("Invalid Request");
+  } else {
+    try {
+      const response = await axios.post(
+        process.env.EDIT_API_URL,
+        JSON.stringify(newTweet),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res
+        .status(201)
+        .send(
+          "<h3>Message sent successfully please check your Email Address</h3>"
+        );
+    } catch (error) {
+      console.log(`error`, error);
+      console.log(newTweet);
+      res
+        .status(500)
+        .send(
+          "Something went wrong, please contact to <b>techfi1992@gmail.com</b>"
+        );
+    }
+  }
+});
+
 app.listen(PORT, () => {
   // Listening API endpoints in localhost
   console.log(`Server is running on http://localhost:${PORT}`);
