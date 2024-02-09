@@ -1,3 +1,4 @@
+const awsServerlessExpress = require('aws-serverless-express');
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -90,7 +91,23 @@ app.post("/edit-tweet", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  // Listening API endpoints in localhost
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+const server = awsServerlessExpress.createServer(app);
+
+exports.handler = (event, context) => {
+    // The callback is used to customize the response
+  context.callbackWaitsForEmptyEventLoop = false;
+  
+  awsServerlessExpress.proxy(server, event, context, 'CALLBACK', (error, response) => {
+    if (error) {
+      context.fail(error);
+    } else {
+      // Adjust the response to set Content-Type to text/html
+      response.headers['Content-Type'] = 'text/html';
+      
+      // Ensure no isBase64Encoded flag unless your content is actually base64 encoded
+      response.isBase64Encoded = false;
+      
+      context.succeed(response);
+    }
+  });
+};

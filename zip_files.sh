@@ -3,6 +3,6 @@
 output="archive.zip"
 
 # Zip the file or directory
-zip -r $output ./* -x "$output" "./node_modules/*" "./zip_files.sh" "./README.md" "./package-lock.json"
+zip -r $output ./* -x "$output" "./zip_files.sh" "./README.md"
 
 echo "all files has been zipped into '$output'"

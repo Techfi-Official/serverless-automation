@@ -15,14 +15,15 @@
       <br />
       <h3>Last Generated Tweet</h3>
       <!-- Show generated tweet bootstrap -->
-      <form action="/edit-tweet" method="post">
+      <form action="/PROD/edit-tweet" method="post">
         <div class="form-group">
-          <label for="instructions">Manually edited post</label>
+          <label for="edit_tweet">Manually edited post</label>
           <div class="card">
             <input
+              name="edit_tweet"
               type="text"
               class="card-text card-body"
-              id="previous_tweet"
+              id="edit_tweet"
               value="<%= tweet %>"
             />
           </div>
@@ -31,7 +32,7 @@
       </form>
       <br />
       <br />
-      <form action="/new-tweet" method="post">
+      <form action="/PROD/new-tweet" method="post">
         <h3>Change ChatGPT Instructions</h3>
         <!-- Text Input for Text Creation Prompt -->
         <div class="form-group">
