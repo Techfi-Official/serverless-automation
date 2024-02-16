@@ -48,6 +48,7 @@ const streamToBuffer = (stream) =>
 
 // Reads a fragment's data from S3 and returns (Promise<Buffer>)
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#getting-a-file-from-an-amazon-s3-bucket
+// eslint-disable-next-line no-unused-vars
 async function readS3BucketData(ownerId, id) {
     // Create the PUT API params from our details
 
