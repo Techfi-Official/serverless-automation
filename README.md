@@ -21,3 +21,5 @@ npm run zip
 Add Archive.zip in Lambda function
 
 <b>Note:</b> For more adding CSS and images, please contact with <b> Kamyab Rouhifar </b>
+
+Facing issue on Sharp Module => refer to : https://sharp.pixelplumbing.com/install#cross-platform
