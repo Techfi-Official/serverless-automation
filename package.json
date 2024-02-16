@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node index.js",
         "format": "npx prettier . --write",
-        "zip": "sh ./zip_files.sh"
+        "zip": "sh ./zip_files.sh",
+        "lint": "npx eslint ."
     },
     "keywords": [],
     "author": "",
