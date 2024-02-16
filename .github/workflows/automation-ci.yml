@@ -1,21 +1,35 @@
-name: serverless-automation
+name: Node.js CI
+
+# This workflow is triggered on pushes and pull requests to the main branch.
 on:
     push:
         branches: [main]
     pull_request:
         branches: [main]
+
 jobs:
-    lint:
+    build:
         runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.x, 16.x, 18.x]
+
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-            - name: Use Node.js 18 Release x86_64 Linux distributions
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v2
               with:
-                  node-version: '18'
-                  cache: npm
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'npm'
+
             - name: Install dependencies
-              run: npm ci
-            - name: Lint
-              run: npm run lint
+              run: npm install
+
+            - name: Run ESLint
+              run: npx eslint .
+
+            - name: Build
+              run: npm run build
+
+        # Optional: add additional steps to run tests or other checks
