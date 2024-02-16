@@ -1,64 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-    <title>Tweet Edit Wizard</title>
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="container mt-5">
-      <h1>Tweet Editing Wizard</h1>
-      <!-- Add spacing between h2 and h3 -->
-      <br />
-      <h3>Last Generated Tweet</h3>
-      <!-- Show generated tweet bootstrap -->
-      <form action="/PROD/edit-tweet" method="post">
-        <div class="form-group">
-          <label for="edit_tweet">Manually edited post</label>
-          <div class="card">
-            <input
-              name="edit_tweet"
-              type="text"
-              class="card-text card-body"
-              id="edit_tweet"
-              value="<%= tweet %>"
-            />
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Post tweet</button>
-      </form>
-      <br />
-      <br />
-      <form action="/PROD/new-tweet" method="post">
-        <h3>Change ChatGPT Instructions</h3>
-        <!-- Text Input for Text Creation Prompt -->
-        <div class="form-group">
-          <label for="instructions">Text Description Prompt</label>
-          <textarea
-            name="instructions"
-            class="form-control"
-            id="instructions"
-            rows="3"
-            placeholder="Enter your text here"
-          ></textarea>
-        </div>
-        <input
-          name="previous_tweet"
-          type="hidden"
-          id="previous_tweet"
-          value="<%= tweet %>"
+    <head>
+        <title>Tweet Edit Wizard</title>
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            rel="stylesheet"
         />
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary">Submit to AI</button>
-      </form>
-    </div>
+    </head>
+    <body>
+        <div class="container mt-5">
+            <%if (image) { %>
+            <img
+                class="w-25 h-25 d-inline-block"
+                src="data:image/png;base64,<%= image %>"
+                alt="sample"
+            />
+            <% } %>
+            <h1>Tweet Editing Wizard</h1>
+            <!-- Add spacing between h2 and h3 -->
+            <br />
+            <h3>Last Generated Tweet</h3>
+            <!-- Show generated tweet bootstrap -->
+            <form action="/PROD/edit-tweet" method="post">
+                <div class="form-group">
+                    <label for="edit_tweet">Manually edited post</label>
+                    <div class="card">
+                        <input
+                            name="edit_tweet"
+                            type="text"
+                            class="card-text card-body"
+                            id="edit_tweet"
+                            value="<%= tweet %>"
+                        />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Post tweet
+                </button>
+            </form>
+            <br />
+            <br />
+            <form action="/PROD/new-tweet" method="post">
+                <h3>Change ChatGPT Instructions</h3>
+                <!-- Text Input for Text Creation Prompt -->
+                <div class="form-group">
+                    <label for="instructions">Text Description Prompt</label>
+                    <textarea
+                        name="instructions"
+                        class="form-control"
+                        id="instructions"
+                        rows="3"
+                        placeholder="Enter your text here"
+                    ></textarea>
+                </div>
+                <input
+                    name="previous_tweet"
+                    type="hidden"
+                    id="previous_tweet"
+                    value="<%= tweet %>"
+                />
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary">
+                    Submit to AI
+                </button>
+            </form>
+        </div>
 
-    <!-- Bootstrap JS and its dependencies -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  </body>
+        <!-- Bootstrap JS and its dependencies -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    </body>
 </html>
