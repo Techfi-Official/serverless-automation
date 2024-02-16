@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "description": "Server-side rendering with Node.js on AWS Lambda",
     "main": "index.js",
+    "engines": {
+        "node": "20.x"
+    },
     "scripts": {
         "start": "node index.js",
         "format": "npx prettier . --write",
