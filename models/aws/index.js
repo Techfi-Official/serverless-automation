@@ -4,6 +4,7 @@ const {
     PutObjectCommand,
     GetObjectCommand,
     DeleteObjectCommand,
+    ListObjectsV2Command,
 } = require('@aws-sdk/client-s3')
 
 // Writes a fragment's data to an S3 Object in a Bucket
@@ -32,7 +33,6 @@ const streamToBuffer = (stream) =>
     new Promise((resolve, reject) => {
         // As the data streams in, we'll collect it into an array.
         const chunks = []
-
         // Streams have events that we can listen for and run
         // code.  We need to know when new `data` is available,
         // if there's an `error`, and when we're at the `end`
@@ -55,19 +55,34 @@ async function readS3BucketData(ownerId, id) {
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         // Our key will be a mix of the ownerID and fragment id, written as a path
-        Key: `Earbud.png`,
+        Prefix: `image-ai/`,
     }
 
     // Create a GET Object command to send to S3
-    const command = new GetObjectCommand(params)
+    const command = new ListObjectsV2Command(params)
 
     try {
         // Get the object from the Amazon S3 bucket. It is returned as a ReadableStream.
 
-        const data = await s3Client.send(command)
-
+        const { Contents } = await s3Client.send(command)
+        const filteredContentsImageKeys = Contents.map(
+            (content) => content.Key
+        ).filter((key) => key.match(/\.(jpg|jpeg|png|gif)$/i))
         // Convert the ReadableStream to a Buffer
-        return streamToBuffer(data.Body)
+        // Fetch all image buffers
+        const imageBuffers = await Promise.all(
+            filteredContentsImageKeys.map((key) => {
+                const params = {
+                    Bucket: process.env.AWS_S3_BUCKET_NAME,
+                    Key: key,
+                }
+                const command = new GetObjectCommand(params)
+                return s3Client.send(command)
+            })
+        )
+        return imageBuffers.map((img) => ({
+            metaData: streamToBuffer(img.Body),
+        }))
     } catch (err) {
         console.log('err', err)
         throw new Error('unable to read s3 data')

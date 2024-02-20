@@ -6,17 +6,25 @@ module.exports = async (req, res) => {
         const s3 = new S3Bucket()
 
         const data = await s3.getData()
-        imageConversion(data)
+        console.log('data', data)
+        Promise.all(
+            data.map(async (image) => {
+                const data = await image.metaData
+                return imageConversion(data)
+            })
+        )
             .then(async (outputBuffer) => {
                 // Set the content type to image/png
                 res.type('text/html')
-                console.log(outputBuffer.toString('base64'))
+                console.log('outputBuffer', outputBuffer)
                 res.setHeader('Cache-Control', 'no-cache')
                 // Send the converted image buffer as a response
                 res.render('index', {
                     title: 'Server-Side Rendered Page on AWS Lambda',
                     tweet: 'N/A',
-                    image: outputBuffer.toString('base64'),
+                    images: outputBuffer.map((outputBuffer) =>
+                        outputBuffer.toString('base64')
+                    ),
                 })
             })
             .catch((err) => {

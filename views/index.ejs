@@ -10,12 +10,14 @@
     </head>
     <body>
         <div class="container mt-5">
-            <%if (image) { %>
-            <img
-                class="w-25 h-25 d-inline-block"
-                src="data:image/png;base64,<%= image %>"
-                alt="sample"
-            />
+            <%if (images.length > 0) { %>
+             <% images.forEach(function(image) { %>
+                <img
+                    class="w-25 h-25 d-inline-block"
+                    src="data:image/png;base64,<%= image %>"
+                    alt="sample"
+                />
+              <% }); %> 
             <% } %>
             <h1>Tweet Editing Wizard</h1>
             <!-- Add spacing between h2 and h3 -->
