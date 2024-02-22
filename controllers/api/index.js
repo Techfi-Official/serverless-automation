@@ -2,36 +2,29 @@ const { S3Bucket } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports = async (req, res) => {
     try {
-        console.log('hi')
         const s3 = new S3Bucket()
-
+        console.log('hi')
         const data = await s3.getData()
-        console.log('data', data)
-        Promise.all(
+        const tweet = req.query.tweet
+        // Await the completion of all promises inside Promise.all
+        const outputBuffer = await Promise.all(
             data.map(async (image) => {
-                const data = await image.metaData
-                return imageConversion(data)
+                // Assuming metaData is a promise. If it's not, remove await.
+                const dataImg = await image.metaData
+                return imageConversion(dataImg)
             })
         )
-            .then(async (outputBuffer) => {
-                // Set the content type to image/png
-                res.type('text/html')
-                console.log('outputBuffer', outputBuffer)
-                res.setHeader('Cache-Control', 'no-cache')
-                // Send the converted image buffer as a response
-                res.render('index', {
-                    title: 'Server-Side Rendered Page on AWS Lambda',
-                    tweet: 'N/A',
-                    images: outputBuffer.map((outputBuffer) =>
-                        outputBuffer.toString('base64')
-                    ),
-                })
-            })
-            .catch((err) => {
-                console.error(err)
-                res.status(500).send('Error processing image')
-            })
+        console.log('I am here')
+        res.type('text/html')
+
+        res.setHeader('Cache-Control', 'no-cache')
+        // Send the converted image buffer as a response
+        res.render('index', {
+            title: 'Server-Side Rendered Page on AWS Lambda',
+            tweet: tweet ?? 'N/A',
+            images: outputBuffer.map((buffer) => buffer.toString('base64')),
+        })
     } catch (err) {
-        res.status(404).send('sending bad request')
+        res.status(500).send(`Image Error Process`)
     }
 }

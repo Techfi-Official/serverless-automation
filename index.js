@@ -22,15 +22,15 @@ app.use(helmet())
 // Use CORS middleware so we can make requests across origins
 app.use(cors())
 
-// Main route
-app.get('/', (req, res) => {
-    const tweet = req.query.tweet
-    res.render('index', {
-        title: 'Server-Side Rendered Page on AWS Lambda',
-        tweet: tweet ?? 'N/A',
-        image: null,
-    })
-})
+// // Main route
+// app.get('/', (req, res) => {
+//     const tweet = req.query.tweet
+//     res.render('index', {
+//         title: 'Server-Side Rendered Page on AWS Lambda',
+//         tweet: tweet ?? 'N/A',
+//         image: null,
+//     })
+// })
 app.post('/new-tweet', async (req, res) => {
     const tweetInstructions = req.body || null
     console.log(`tweetInstructions`, tweetInstructions)
