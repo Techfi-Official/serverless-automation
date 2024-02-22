@@ -54,6 +54,6 @@ jobs:
               --timeout 20 \
               --zip-file fileb://archive.zip
           env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESSES_KEY_ID }}
+              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESSES_KEY }}
               AWS_REGION: us-east-1
