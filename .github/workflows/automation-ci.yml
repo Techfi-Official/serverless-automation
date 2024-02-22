@@ -34,10 +34,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v2
+              uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }} # Match the version used in your Lambda
                   cache: 'npm'
@@ -65,7 +65,7 @@ jobs:
             - name: Update Lambda function code
               run: |
                   aws lambda update-function-code --function-name automation-media --zip-file fileb://archive.zip
-
-            - name: Update Lambda function configuration
-              run: |
-                  aws lambda update-function-configuration --function-name automation-media --timeout 15
+            - name: Clean up
+              run: rm -rf archive.zip
+            - name: Deployed successfully
+              run: echo "Deployed successfully"
