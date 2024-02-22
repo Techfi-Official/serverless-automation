@@ -30,30 +30,29 @@ jobs:
             - name: Run ESLint
               run: npx eslint .
     deploy:
-        - name: Deploying to AWS Lambda
         runs-on: ubuntu-latest
         steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
+            - name: Checkout code
+              uses: actions/checkout@v2
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v2
-          with:
-              node-version: ${{ matrix.node-version }} # Match the version used in your Lambda
-              cache: 'npm'
+            - name: Setup Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }} # Match the version used in your Lambda
+                  cache: 'npm'
 
-        - name: Install dependencies
-          run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-        - name: Package Application
-          run: zip -r archive.zip ./* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*"
+            - name: Package Application
+              run: zip -r archive.zip ./* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*"
 
-        - name: Deploy to AWS Lambda
-          run:
-              aws lambda update-function-code --function-name automation-media \
-              --timeout 20 \
-              --zip-file fileb://archive.zip
-          env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESSES_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESSES_KEY }}
-              AWS_REGION: us-east-1
+            - name: Deploy to AWS Lambda
+              run:
+                  aws lambda update-function-code --function-name automation-media \
+                  --timeout 20 \
+                  --zip-file fileb://archive.zip
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESSES_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESSES_KEY }}
+                  AWS_REGION: us-east-1
