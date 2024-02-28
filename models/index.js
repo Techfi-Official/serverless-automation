@@ -5,7 +5,7 @@ class S3Bucket {
     constructor(ownerId = '', id = '') {
         this.id = id || nanoid()
 
-        ownerId = 'Kamyab'
+        ownerId = 'Kamyabs'
 
         if (ownerId != null) {
             this.ownerId = ownerId
