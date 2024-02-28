@@ -3,18 +3,25 @@ const imageConversion = require('../../utils')
 module.exports = async (req, res) => {
     try {
         const s3 = new S3Bucket()
-        console.log('hi')
+
         const data = await s3.getData()
         const tweet = req.query.tweet
+        console.log(`Data fetched: ${data.length} items`)
         // Await the completion of all promises inside Promise.all
         const outputBuffer = await Promise.all(
             data.map(async (image) => {
-                // Assuming metaData is a promise. If it's not, remove await.
-                const dataImg = await image.metaData
-                return imageConversion(dataImg)
+                try {
+                    console.log('Processing image:', image)
+                    const dataImg = await image.metaData // Ensure this is correct
+                    return await imageConversion(dataImg)
+                } catch (error) {
+                    console.error('Error converting image:', error)
+                    return null // Or handle as appropriate
+                }
             })
         )
-        console.log('I am here')
+
+        console.log('All images processed')
         res.type('text/html')
 
         res.setHeader('Cache-Control', 'no-cache')
