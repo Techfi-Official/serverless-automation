@@ -32,7 +32,7 @@ jobs:
             - name: Minify JavaScript files
               run: |
                   npm install terser -g
-                  terser  -c -m -source-map -o dist/ ./*.js
+                  terser  -c -m --source-map -o dist/ ./*.js
 
     deploy-aws:
         needs: build
