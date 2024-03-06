@@ -10,7 +10,6 @@ const getCredentials = () => {
             accessKeyId: process.env.AWS_ACCESSES_KEY_ID,
             secretAccessKey: process.env.AWS_SECRET_ACCESSES_KEY,
         }
-        console.log('Getting credentials from environment variables')
         return credentials
     }
 }

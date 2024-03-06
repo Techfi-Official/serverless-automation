@@ -2,10 +2,8 @@ const { readS3BucketData } = require('./aws')
 const { nanoid } = require('nanoid')
 
 class S3Bucket {
-    constructor(ownerId = '', id = '') {
-        this.id = id || nanoid()
-
-        ownerId = 'Kamyabs'
+    constructor(ownerId = '', imageID = '') {
+        this.imageID = imageID || nanoid()
 
         if (ownerId != null) {
             this.ownerId = ownerId
@@ -15,7 +13,7 @@ class S3Bucket {
     }
 
     getData() {
-        return readS3BucketData(this.ownerId, this.id)
+        return readS3BucketData(this.ownerId, this.imageID)
     }
 }
 

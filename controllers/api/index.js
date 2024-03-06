@@ -2,26 +2,32 @@ const { S3Bucket } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports = async (req, res) => {
     try {
-        const s3 = new S3Bucket()
+        let tweet = ''
+        let outputBuffer = []
+        if (req.query.id) {
+            const s3 = new S3Bucket(req.query.id)
 
-        const data = await s3.getData()
-        const tweet = req.query.tweet
-        console.log(`Data fetched: ${data.length} items`)
-        // Await the completion of all promises inside Promise.all
-        const outputBuffer = await Promise.all(
-            data.map(async (image) => {
-                try {
-                    console.log('Processing image:', image)
-                    const dataImg = await image.metaData // Ensure this is correct
-                    return await imageConversion(dataImg)
-                } catch (error) {
-                    console.error('Error converting image:', error)
-                    return null // Or handle as appropriate
-                }
-            })
-        )
+            const data = await s3.getData()
+            tweet = req.query.tweet
 
-        console.log('All images processed')
+            console.log(`Data fetched: ${data.length} items`)
+            // Await the completion of all promises inside Promise.all
+            outputBuffer = await Promise.all(
+                data.map(async (image) => {
+                    try {
+                        console.log('Processing image:', image)
+                        const dataImg = await image.metaData // Ensure this is correct
+                        return await imageConversion(dataImg)
+                    } catch (error) {
+                        console.error('Error converting image:', error)
+                        return null // Or handle as appropriate
+                    }
+                })
+            )
+
+            console.log('All images processed')
+        }
+
         res.type('text/html')
 
         res.setHeader('Cache-Control', 'no-cache')
@@ -33,5 +39,6 @@ module.exports = async (req, res) => {
         })
     } catch (err) {
         res.status(500).send(`Image Error Process`)
+        res.redirect('/')
     }
 }

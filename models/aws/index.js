@@ -55,7 +55,7 @@ async function readS3BucketData(ownerId, id) {
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         // Our key will be a mix of the ownerID and fragment id, written as a path
-        Prefix: `image-ai/`,
+        Prefix: `${ownerId}/`,
     }
 
     // Create a GET Object command to send to S3
@@ -65,24 +65,26 @@ async function readS3BucketData(ownerId, id) {
         // Get the object from the Amazon S3 bucket. It is returned as a ReadableStream.
 
         const { Contents } = await s3Client.send(command)
-        const filteredContentsImageKeys = Contents.map(
-            (content) => content.Key
-        ).filter((key) => key.match(/\.(jpg|jpeg|png|gif)$/i))
-        // Convert the ReadableStream to a Buffer
-        // Fetch all image buffers
-        const imageBuffers = await Promise.all(
-            filteredContentsImageKeys.map((key) => {
-                const params = {
-                    Bucket: process.env.AWS_S3_BUCKET_NAME,
-                    Key: key,
-                }
-                const command = new GetObjectCommand(params)
-                return s3Client.send(command)
-            })
-        )
-        return imageBuffers.map((img) => ({
-            metaData: streamToBuffer(img.Body),
-        }))
+        if (Contents?.length > 0) {
+            const filteredContentsImageKeys = Contents.map(
+                (content) => content.Key
+            ).filter((key) => key.match(/\.(jpg|jpeg|png|gif)$/i))
+            // Convert the ReadableStream to a Buffer
+            // Fetch all image buffers
+            const imageBuffers = await Promise.all(
+                filteredContentsImageKeys.map((key) => {
+                    const params = {
+                        Bucket: process.env.AWS_S3_BUCKET_NAME,
+                        Key: key,
+                    }
+                    const command = new GetObjectCommand(params)
+                    return s3Client.send(command)
+                })
+            )
+            return imageBuffers.map((img) => ({
+                metaData: streamToBuffer(img.Body),
+            }))
+        } else return []
     } catch (err) {
         console.log('err', err)
         throw new Error('unable to read s3 data')
