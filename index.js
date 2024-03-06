@@ -104,7 +104,7 @@ app.post('/post-data', async (req, res) => {
     console.log(`data`, data)
     //write fetch function to post tweet
     // if newTweet is null, return error
-    if (!data?.instruction && !data?.name) {
+    if (!data?.instruction || !data?.name) {
         res.status(400).send(
             `Invalid Request ${data?.instruction} and ${!data?.name}`
         )
