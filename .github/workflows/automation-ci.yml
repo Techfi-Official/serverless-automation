@@ -30,7 +30,9 @@ jobs:
             - name: Run ESLint
               run: npx eslint .
             - name: Minify JavaScript files
-              run: npx terser ./**/*.js --compress --mangle --output dist/
+              run: |
+                  npm install terser -g
+                  terser ./**/*.js --compress --mangle --output dist/
 
     deploy-aws:
         needs: build
