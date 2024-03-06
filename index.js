@@ -16,6 +16,8 @@ app.use(express.urlencoded({ extended: true }))
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use(express.json())
+
 // Use security middleware
 app.use(helmet())
 
