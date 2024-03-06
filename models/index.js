@@ -1,19 +1,22 @@
-const { readS3BucketData } = require('./aws')
+const { readS3BucketData, readDynamoDB } = require('./aws')
 const { nanoid } = require('nanoid')
 
 class S3Bucket {
-    constructor(ownerId = '', imageID = '') {
+    constructor(id = '', imageID = '') {
         this.imageID = imageID || nanoid()
 
-        if (ownerId != null) {
-            this.ownerId = ownerId
+        if (id != null) {
+            this.id = id
         } else {
-            throw new Error('ownerId is required')
+            throw new Error('id is required')
         }
     }
 
-    getData() {
-        return readS3BucketData(this.ownerId, this.imageID)
+    getS3Data() {
+        return readS3BucketData(this.id, this.imageID)
+    }
+    getDynamoDBdata() {
+        return readDynamoDB(this.id, 'twitter')
     }
 }
 

@@ -2,18 +2,18 @@ const { S3Bucket } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports = async (req, res) => {
     try {
-        let tweet = ''
+        let tableData = ''
         let outputBuffer = []
         if (req.query.id) {
             const s3 = new S3Bucket(req.query.id)
 
-            const data = await s3.getData()
-            tweet = req.query.tweet
+            const s3Data = await s3.getS3Data()
+            tableData = await s3.getDynamoDBdata()
 
-            console.log(`Data fetched: ${data.length} items`)
+            console.log(`Data fetched: ${s3Data.length} items`)
             // Await the completion of all promises inside Promise.all
             outputBuffer = await Promise.all(
-                data.map(async (image) => {
+                s3Data.map(async (image) => {
                     try {
                         console.log('Processing image:', image)
                         const dataImg = await image.metaData // Ensure this is correct
@@ -34,11 +34,10 @@ module.exports = async (req, res) => {
         // Send the converted image buffer as a response
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
-            tweet: tweet ?? 'N/A',
+            tweet: tableData?.instruction ?? 'N/A',
             images: outputBuffer.map((buffer) => buffer.toString('base64')),
         })
     } catch (err) {
-        res.status(500).send(`Image Error Process`)
-        res.redirect('/')
+        res.status(500).send(`Image Error Process => ${err.message}`)
     }
 }

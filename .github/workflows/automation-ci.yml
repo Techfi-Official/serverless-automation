@@ -29,10 +29,6 @@ jobs:
 
             - name: Run ESLint
               run: npx eslint .
-            - name: Minify JavaScript files
-              run: |
-                  npm install terser -g
-                  terser  -c -m --source-map -o dist/ ./*.js
 
     deploy-aws:
         needs: build
@@ -51,7 +47,7 @@ jobs:
               run: npm ci
 
             - name: Package Application
-              run: zip -r archive.zip ./dist/* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*"
+              run: zip -r archive.zip ./* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*"
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
