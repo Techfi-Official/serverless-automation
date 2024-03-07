@@ -7,7 +7,7 @@ const {
     DeleteObjectCommand,
     ListObjectsV2Command,
 } = require('@aws-sdk/client-s3')
-const { GetCommand } = require('@aws-sdk/lib-dynamodb')
+const { GetCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
 
 // Writes a fragment's data to an S3 Object in a Bucket
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#upload-an-existing-object-to-an-amazon-s3-bucket
@@ -115,7 +115,7 @@ async function readDynamoDB(id, name) {
         Key: { id: id, name: name },
     }
 
-    // Create a GET command to send to DynamoDB
+    // Create a GET command to send to DynamoDBs
     console.log('params', params)
     const command = new GetCommand(params)
 
@@ -131,7 +131,29 @@ async function readDynamoDB(id, name) {
     }
 }
 
+async function writeDynamoDB(id, instruction, name) {
+    // Configure our PUT params, with the name of the table and item (attributes and keys)
+    const params = {
+        TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+        Item: {
+            id: id,
+            name: name,
+            instruction: instruction,
+        },
+    }
+
+    // Create a PUT command to send to DynamoDB
+    const command = new PutCommand(params)
+
+    try {
+        return await ddbDocClient.send(command)
+    } catch (err) {
+        throw new Error(err)
+    }
+}
+
 module.exports.writeS3BucketData = writeS3BucketData
 module.exports.readS3BucketData = readS3BucketData
 module.exports.deleteS3BucketData = deleteS3BucketData
 module.exports.readDynamoDB = readDynamoDB
+module.exports.writeDynamoDB = writeDynamoDB

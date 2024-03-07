@@ -100,31 +100,6 @@ app.post('/edit-tweet', async (req, res) => {
         }
     }
 })
-
-app.post('/post-data', async (req, res) => {
-    const data = req.body || null
-    console.log(`data`, data)
-    //write fetch function to post tweet
-    // if newTweet is null, return error
-    if (!data?.instruction || !data?.name) {
-        res.status(400).send(
-            `Invalid Request ${data?.instruction} and ${!data?.name}`
-        )
-    } else {
-        try {
-            return res
-                .status(201)
-                .send(`<h3>Message sent successfully ${data?.instruction}</h3>`)
-        } catch (error) {
-            console.log(`error`, error)
-            console.log(data)
-            res.status(500).send(
-                'Something went wrong, please contact to <b>Email Address</b>'
-            )
-        }
-    }
-})
-
 const server = awsServerlessExpress.createServer(app)
 
 if (process.env.NODE_DEV)

@@ -1,11 +1,11 @@
-const { S3Bucket } = require('../../models')
+const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
-module.exports = async (req, res) => {
+module.exports.getData = async (req, res) => {
     try {
         let tableData = ''
         let outputBuffer = []
         if (req.query.id) {
-            const s3 = new S3Bucket(req.query.id)
+            const s3 = new S3BucketAndDynamoDB(req.query.id)
 
             const s3Data = await s3.getS3Data()
             tableData = await s3.getDynamoDBdata()
@@ -39,5 +39,35 @@ module.exports = async (req, res) => {
         })
     } catch (err) {
         res.status(500).send(`Image Error Process => ${err.message}`)
+    }
+}
+
+module.exports.postData = async (req, res) => {
+    const data = req.body || null
+    console.log(`data`, data)
+    const dynamodb = new S3BucketAndDynamoDB(
+        data?.id,
+        null,
+        data?.instruction,
+        data?.name
+    )
+    dynamodb.writeDynamoDB()
+
+    if (!data?.instruction || !data?.name) {
+        res.status(400).send(
+            `Invalid Request ${data?.instruction} and ${!data?.name}`
+        )
+    } else {
+        try {
+            return res
+                .status(201)
+                .send(`<h3>Message sent successfully ${data?.instruction}</h3>`)
+        } catch (error) {
+            console.log(`error`, error)
+            console.log(data)
+            res.status(500).send(
+                'Something went wrong, please contact to <b>Email Address</b>'
+            )
+        }
     }
 }
