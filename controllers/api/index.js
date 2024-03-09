@@ -112,6 +112,7 @@ module.exports.postImageAI = async (req, res) => {
                 console.log(response)
                 const buffer = Buffer.from(response.data, 'binary')
                 res.setHeader('content-type', 'image/png')
+                console.log('buffer', buffer)
                 res.status(201).send(buffer)
             } catch (error) {
                 console.error(error)

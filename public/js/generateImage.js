@@ -19,15 +19,18 @@ document.getElementById('image-trigger').addEventListener('click', function () {
         }, interval)
     }, 5000)
     // Perform the fetch request
-    fetch('http://localhost:3000/post-image-ai', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            text: document.getElementById('textInputAI').value,
-        }),
-    })
+    fetch(
+        'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/post-image-ai',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text: document.getElementById('textInputAI').value,
+            }),
+        }
+    )
         .then((response) => response.arrayBuffer())
         .then((buffer) => {
             clearInterval(intervalId)
