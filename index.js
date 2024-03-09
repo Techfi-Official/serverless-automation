@@ -18,9 +18,14 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(express.json())
 
-// Use security middleware
-app.use(helmet())
-
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'img-src': ["'self'", 'data:', 'blob:'],
+        },
+    })
+)
 // Use CORS middleware so we can make requests across origins
 app.use(cors())
 

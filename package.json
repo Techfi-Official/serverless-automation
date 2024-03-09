@@ -8,6 +8,7 @@
     },
     "scripts": {
         "start": "node index.js",
+        "watch": "nodemon start  --watch",
         "format": "npx prettier . --write",
         "zip": "sh ./zip_files.sh",
         "lint": "npx eslint ."
@@ -22,6 +23,7 @@
         "aws-sdk": "^2.1558.0",
         "aws-serverless-express": "^3.4.0",
         "axios": "^1.6.5",
+        "comfy-ui-client": "^0.1.2",
         "cors": "^2.8.5",
         "crypto-js": "^4.2.0",
         "dotenv": "^16.4.4",
@@ -29,11 +31,14 @@
         "express": "^4.18.2",
         "helmet": "^7.1.0",
         "nanoid": "^3.3.4",
+        "node-fetch": "^3.3.2",
         "node-gyp": "^10.0.1",
+        "replicate": "^0.27.1",
         "sharp": "^0.33.2"
     },
     "devDependencies": {
         "eslint": "^8.56.0",
+        "nodemon": "^3.1.0",
         "prettier": "3.2.5"
     }
 }

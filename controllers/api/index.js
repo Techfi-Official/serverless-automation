@@ -1,3 +1,9 @@
+const Replicate = require('replicate')
+const fs = require('fs')
+const axios = require('axios')
+
+const jsonFilePath = process.cwd() + '/data/workflow.json'
+
 const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports.getData = async (req, res) => {
@@ -70,4 +76,48 @@ module.exports.postData = async (req, res) => {
             )
         }
     }
+}
+
+module.exports.postImageAI = async (req, res) => {
+    const replicate = new Replicate({
+        auth: process.env.REPLICATE_API_TOKEN,
+        userAgent: 'https://www.npmjs.com/package/create-replicate',
+    })
+    const model =
+        'fofr/any-comfyui-workflow:f8bbe354839d762488971160872eac54dc1c9e61462e91743d360d1d640020c6'
+
+    fs.readFile(jsonFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err)
+            return
+        }
+        // Parse the JSON data and convert it into a JavaScript object
+        const jsonObject = JSON.parse(data)
+        jsonObject['6'].inputs.text = req.body.text
+        // Use the jsonObject here
+        console.log(jsonObject['6'].inputs.text)
+        const input = {
+            workflow_json: JSON.stringify(jsonObject),
+            randomise_seeds: true,
+            return_temp_files: false,
+        }
+        console.log('Running...')
+        replicate.run(model, { input }).then(async (output) => {
+            console.log(output)
+            try {
+                const response = await axios.get(output, {
+                    responseType: 'arraybuffer',
+                })
+                console.log(response)
+                const buffer = Buffer.from(response.data, 'binary')
+                res.setHeader('content-type', 'image/png')
+                res.status(201).send(buffer)
+            } catch (error) {
+                console.error(error)
+                res.status(500).send(
+                    'An error occurred while fetching the image'
+                )
+            }
+        })
+    })
 }

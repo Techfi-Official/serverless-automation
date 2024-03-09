@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+        <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://api.replicate.com;">
         <title>Tweet Edit Wizard</title>
         <!-- Bootstrap CSS -->
         <link
@@ -42,6 +43,31 @@
                 </button>
             </form>
             <br />
+            <section id="image-ai">
+                This is the AI input image.
+            </section>
+            <div class="card"  >
+                <img
+                    id="imageDisplay"
+                    class="card-img-top img-fluid img-thumbnail"
+                    src="/img/image.jpeg"
+                    alt="Card image AI cap"
+                    style="width: 450px; align-self: center;"
+                />
+                <div class="card-body" style="align-items: flex-end; display:flex; flex-direction:column;">
+                    <input
+                    style="width: 100%;"
+                    type="text"
+                    class="card-text card-body"
+                    name="textInputAI"
+                    id="textInputAI"
+                    />
+                    <button id="image-trigger" class="btn btn-primary mb-5 mt-3" >
+                    Generate Image
+                    </button>
+                </div>
+            </div>    
+            
             <br />
             <form action="/PROD/new-tweet" method="post">
                 <h3>Change ChatGPT Instructions</h3>
@@ -56,6 +82,7 @@
                         placeholder="Enter your text here"
                     ></textarea>
                 </div>
+
                 <input
                     name="previous_tweet"
                     type="hidden"
@@ -69,6 +96,8 @@
             </form>
         </div>
 
+        <!-- Custom JS-->
+        <script src="/js/generateImage.js"></script>
         <!-- Bootstrap JS and its dependencies -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
