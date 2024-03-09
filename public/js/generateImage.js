@@ -20,7 +20,7 @@ document.getElementById('image-trigger').addEventListener('click', function () {
     }, 5000)
     // Perform the fetch request
     fetch(
-        'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/post-image-ai',
+        'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/PROD/post-image-ai',
         {
             method: 'POST',
             headers: {
