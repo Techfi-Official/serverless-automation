@@ -93,6 +93,7 @@ module.exports.postImageAI = async (req, res) => {
         }
         // Parse the JSON data and convert it into a JavaScript object
         const jsonObject = JSON.parse(data)
+        // Posting positive text prompt
         jsonObject['6'].inputs.text = req.body.text
         // Use the jsonObject here
         console.log(jsonObject['6'].inputs.text)

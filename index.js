@@ -22,13 +22,23 @@ app.use(
     helmet.contentSecurityPolicy({
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            'img-src': ["'self'", 'data:', 'blob:'],
+            'img-src': [
+                "'self'",
+                'data:',
+                'blob:',
+                'https://d39oted90y97ty.cloudfront.net',
+            ],
+            'script-src': ["'self'", 'https://d39oted90y97ty.cloudfront.net'],
         },
     })
 )
 // Use CORS middleware so we can make requests across origins
-app.use(cors())
-
+app.use(
+    cors({
+        origin: 'https://d39oted90y97ty.cloudfront.net/*',
+        methods: ['GET'],
+    })
+)
 // // Main route
 // app.get('/', (req, res) => {
 //     const tweet = req.query.tweet
