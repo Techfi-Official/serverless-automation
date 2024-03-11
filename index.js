@@ -28,7 +28,11 @@ app.use(
                 'blob:',
                 'https://d39oted90y97ty.cloudfront.net',
             ],
-            'script-src': ["'self'", 'https://d39oted90y97ty.cloudfront.net'],
+            'script-src': [
+                "'self'",
+                'https://d39oted90y97ty.cloudfront.net',
+                'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/PROD/post-image-ai',
+            ],
         },
     })
 )

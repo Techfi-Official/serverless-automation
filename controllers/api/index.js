@@ -109,11 +109,9 @@ module.exports.postImageAI = async (req, res) => {
                 const response = await axios.get(output, {
                     responseType: 'arraybuffer',
                 })
-                console.log(response)
-                const buffer = Buffer.from(response.data, 'binary')
-                res.setHeader('content-type', 'image/png')
-                console.log('buffer', buffer)
-                res.status(201).send(buffer)
+                const imageBuffer = Buffer.from(response.data, 'binary')
+                res.setHeader('Content-Type', 'image/png')
+                res.status(201).send(imageBuffer)
             } catch (error) {
                 console.error(error)
                 res.status(500).send(

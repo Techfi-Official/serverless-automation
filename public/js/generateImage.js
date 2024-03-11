@@ -31,12 +31,10 @@ document.getElementById('image-trigger').addEventListener('click', function () {
             }),
         }
     )
-        .then((response) => response.arrayBuffer())
-        .then((buffer) => {
+        .then((response) => response.blob())
+        .then((blob) => {
             clearInterval(intervalId)
             clearTimeout(timeout)
-            console.log('Success:', buffer)
-            const blob = new Blob([buffer], { type: 'image/png' })
             console.log('Success:', blob)
             const imageUrl = URL.createObjectURL(blob)
             console.log('Success 2:', imageUrl)
