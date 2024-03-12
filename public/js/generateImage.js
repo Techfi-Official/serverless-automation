@@ -1,6 +1,8 @@
 document.getElementById('image-trigger').addEventListener('click', function () {
     const element = document.getElementById('image-ai')
+    const gallery = document.getElementById('image-gallery')
 
+    const params = new URLSearchParams(new URL(window.location.href).search)
     let intervalId = null
     let progress = 0
     element.innerText = 'Sending Image...'
@@ -19,27 +21,35 @@ document.getElementById('image-trigger').addEventListener('click', function () {
         }, interval)
     }, 5000)
     // Perform the fetch request
-    fetch(
-        'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/PROD/post-image-ai',
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                text: document.getElementById('textInputAI').value,
-            }),
-        }
-    )
+    fetch('http://localhost:3000/post-image-ai', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            id: params.get('id'),
+            text: document.getElementById('textInputAI').value,
+            platform: 'twitter',
+        }),
+    })
         .then((response) => response.blob())
+
         .then((blob) => {
             clearInterval(intervalId)
             clearTimeout(timeout)
-            console.log('Success:', blob)
-            const imageUrl = URL.createObjectURL(blob)
-            console.log('Success 2:', imageUrl)
-            element.innerText = 'Image Sent Successfully'
-            document.getElementById('imageDisplay').src = imageUrl
+            const reader = new FileReader()
+            console.log('Success 2:', blob)
+            reader.readAsDataURL(blob)
+            reader.onloadend = function () {
+                const base64data = reader.result
+                document.getElementById('imageDisplay').src = base64data
+                const imgElement = document.createElement('img')
+                imgElement.src = base64data
+                imgElement.style.width = '25%'
+                imgElement.style.height = '25%'
+                gallery.appendChild(imgElement)
+                element.innerText = 'Image Sent Successfully'
+            }
         })
         .catch((error) => {
             clearInterval(intervalId)

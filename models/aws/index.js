@@ -7,16 +7,16 @@ const {
     DeleteObjectCommand,
     ListObjectsV2Command,
 } = require('@aws-sdk/client-s3')
-const { GetCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
+const { QueryCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
 
 // Writes a fragment's data to an S3 Object in a Bucket
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#upload-an-existing-object-to-an-amazon-s3-bucket
-async function writeS3BucketData(ownerId, id, data) {
+async function writeS3BucketData(clientId, imageId, data) {
     // Create the PUT API params from our details
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         // Our key will be a mix of the ownerID and fragment id, written as a path
-        Key: `Earbud.png`,
+        Key: `${clientId}/${imageId}`,
         Body: data,
     }
 
@@ -51,13 +51,13 @@ const streamToBuffer = (stream) =>
 // Reads a fragment's data from S3 and returns (Promise<Buffer>)
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#getting-a-file-from-an-amazon-s3-bucket
 // eslint-disable-next-line no-unused-vars
-async function readS3BucketData(ownerId, id) {
+async function readS3BucketData(clientId) {
     // Create the PUT API params from our details
 
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         // Our key will be a mix of the ownerID and fragment id, written as a path
-        Prefix: `${ownerId}/`,
+        Prefix: `${clientId}/`,
     }
 
     // Create a GET Object command to send to S3
@@ -70,7 +70,7 @@ async function readS3BucketData(ownerId, id) {
         if (Contents?.length > 0) {
             const filteredContentsImageKeys = Contents.map(
                 (content) => content.Key
-            ).filter((key) => key.match(/\.(jpg|jpeg|png|gif)$/i))
+            )
             // Convert the ReadableStream to a Buffer
             // Fetch all image buffers
             const imageBuffers = await Promise.all(
@@ -108,36 +108,42 @@ async function deleteS3BucketData(ownerId, id) {
     }
 }
 
-async function readDynamoDB(id, name) {
+async function readDynamoDB(clientId) {
     // Configure our GET params, with the name of the table and key (partition key + sort key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        Key: { id: id, name: name },
+        KeyConditionExpression: 'clientId = :clientId',
+        ExpressionAttributeValues: {
+            ':clientId': clientId,
+        },
+        ProjectionExpression: 'imageId, platform, instruction',
     }
 
     // Create a GET command to send to DynamoDBs
     console.log('params', params)
-    const command = new GetCommand(params)
+    const command = new QueryCommand(params)
 
     try {
         // Wait for the data to come back from AWS
-        console.log('hi')
+
         const data = await ddbDocClient.send(command)
         // We may or may not get back any data (e.g., no item found for the given key).
         // If we get back an item (fragment), we'll return it.  Otherwise we'll return `undefined`.
+        console.log('hi', data)
         return data?.Item
     } catch (err) {
         throw new Error('unable to read data from DynamoDB')
     }
 }
 
-async function writeDynamoDB(id, instruction, name) {
+async function writeDynamoDB(clientId, imageId, instruction, platform) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
         Item: {
-            id: id,
-            name: name,
+            clientId: clientId,
+            imageId: imageId,
+            platform: platform,
             instruction: instruction,
         },
     }

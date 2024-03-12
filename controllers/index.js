@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-router.get(['/'], require('./api').getData)
+router.get(['/'], require('./api').getDataRenderHTML)
 
 router.post(['/post-data'], require('./api').postData)
 

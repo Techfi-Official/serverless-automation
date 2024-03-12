@@ -11,15 +11,17 @@
     </head>
     <body>
         <div class="container mt-5">
-            <%if (images.length > 0) { %>
-             <% images.forEach(function(image) { %>
-                <img
-                    class="w-25 h-25 d-inline-block"
-                    src="data:image/png;base64,<%= image %>"
-                    alt="sample"
-                />
-              <% }); %> 
-            <% } %>
+            <div id="image-gallery">
+                <%if (images.length > 0) { %>
+                <% images.forEach(function(image) { %>
+                    <img
+                        class="w-25 h-25 d-inline-block"
+                        src="data:image/png;base64,<%= image %>"
+                        alt="sample"
+                    />
+                <% }); %> 
+                <% } %>
+            </div>
             <h1>Tweet Editing Wizard</h1>
             <!-- Add spacing between h2 and h3 -->
             <br />
@@ -50,7 +52,7 @@
                 <img
                     id="imageDisplay"
                     class="card-img-top img-fluid img-thumbnail"
-                    src="https://d39oted90y97ty.cloudfront.net/img/image.jpeg"
+                    src="/img/image.jpeg"
                     alt="Card image AI cap"
                     style="width: 450px; align-self: center;"
                 />
@@ -97,8 +99,8 @@
         </div>
 
         <!-- Custom JS-->
+        <script src="/js/generateImage.js"></script>
         <!-- Bootstrap JS and its dependencies -->
-        <script src="https://d39oted90y97ty.cloudfront.net/js/generateImage.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
