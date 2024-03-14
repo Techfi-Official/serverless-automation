@@ -121,8 +121,10 @@ module.exports.postImageAI = async (req, res) => {
                     req.body.platform
                 )
                 await instanceData.postS3Data(imageBuffer)
-                res.setHeader('Content-Type', 'image/png')
-                res.status(201).send(imageBuffer)
+                res.setHeader('Content-Type', 'application/json')
+                res.status(201).send(
+                    JSON.stringify({ image: imageBuffer.toString('base64') })
+                )
             } catch (error) {
                 console.error(error)
                 res.status(500).send(

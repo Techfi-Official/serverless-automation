@@ -35,24 +35,20 @@ document.getElementById('image-trigger').addEventListener('click', function () {
             }),
         }
     )
-        .then((response) => response.blob())
+        .then((response) => response.json())
 
-        .then((blob) => {
+        .then(({ image }) => {
             clearInterval(intervalId)
             clearTimeout(timeout)
-            const reader = new FileReader()
-            console.log('Success 2:', blob)
-            reader.readAsDataURL(blob)
-            reader.onloadend = function () {
-                const base64data = reader.result
-                document.getElementById('imageDisplay').src = base64data
-                const imgElement = document.createElement('img')
-                imgElement.src = base64data
-                imgElement.style.width = '25%'
-                imgElement.style.height = '25%'
-                gallery.appendChild(imgElement)
-                element.innerText = 'Image Sent Successfully'
-            }
+            console.log('Success 2:', image)
+            document.getElementById('imageDisplay').src =
+                'data:image/png;base64,' + image
+            const imgElement = document.createElement('img')
+            imgElement.src = 'data:image/png;base64,' + image
+            imgElement.style.width = '25%'
+            imgElement.style.height = '25%'
+            gallery.appendChild(imgElement)
+            element.innerText = 'Image Sent Successfully'
         })
         .catch((error) => {
             clearInterval(intervalId)
