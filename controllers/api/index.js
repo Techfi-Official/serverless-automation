@@ -1,9 +1,5 @@
-const Replicate = require('replicate')
-const fs = require('fs')
 const axios = require('axios')
 const { nanoid } = require('nanoid')
-
-const jsonFilePath = process.cwd() + '/data/workflow.json'
 
 const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
@@ -34,6 +30,9 @@ module.exports.getDataRenderHTML = async (req, res) => {
             )
 
             console.log('All images processed')
+        } else {
+            res.status(400).send('Invalid Request, request id is missing')
+            return
         }
 
         res.type('text/html')
@@ -80,57 +79,53 @@ module.exports.postData = async (req, res) => {
 }
 
 module.exports.postImageAI = async (req, res) => {
-    const replicate = new Replicate({
-        auth: process.env.REPLICATE_API_TOKEN,
-        userAgent: 'https://www.npmjs.com/package/create-replicate',
-    })
-    const model =
-        'fofr/any-comfyui-workflow:f8bbe354839d762488971160872eac54dc1c9e61462e91743d360d1d640020c6'
+    const data = req.body || null
 
-    fs.readFile(jsonFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err)
-            return
-        }
-        // Parse the JSON data and convert it into a JavaScript object
-        const jsonObject = JSON.parse(data)
-        // Posting positive text prompt
-        jsonObject['6'].inputs.text = req.body.text
-        // Use the jsonObject here
-        console.log(jsonObject['6'].inputs.text)
-        const input = {
-            workflow_json: JSON.stringify(jsonObject),
-            randomise_seeds: true,
-            return_temp_files: false,
-        }
-        console.log('Running...')
-        replicate.run(model, { input }).then(async (output) => {
-            console.log(output)
-            try {
-                const response = await axios.get(output, {
-                    responseType: 'arraybuffer',
-                })
-                const imageBuffer = Buffer.from(response.data, 'binary')
-                if (!Buffer.isBuffer(imageBuffer)) {
-                    return res.status(415).send('Invalid image data')
+    if (!data?.id || !data?.text || !data?.platform) {
+        res.status(400).send('Invalid Request')
+    }
+
+    const input = {
+        workflow_values: {
+            positive_prompt: data.text,
+            negative_prompt: data.text_neg ?? '',
+            seed: Math.floor(Math.random() * 100000),
+        },
+    }
+
+    try {
+        await axios
+            .post(
+                `${process.env.SERVER_AI_MODEL}/development/predict`,
+                JSON.stringify(input),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Api-Key ${process.env.API_KEY}`,
+                    },
                 }
+            )
+            .then(async (response) => {
+                const image = await response.data
+                console.log('Success 2:', response.body)
                 const instanceData = new S3BucketAndDynamoDB(
-                    req.body.id,
+                    data.id,
                     nanoid(),
-                    req.body.text,
-                    req.body.platform
+                    data.text,
+                    data.platform
                 )
-                await instanceData.postS3Data(imageBuffer)
+                await instanceData.postS3Data(
+                    Buffer.from(image.result[0].data, 'base64')
+                )
                 res.setHeader('Content-Type', 'application/json')
-                res.status(201).send(
-                    JSON.stringify({ image: imageBuffer.toString('base64') })
-                )
-            } catch (error) {
-                console.error(error)
-                res.status(500).send(
-                    'An error occurred while fetching the image'
-                )
-            }
-        })
-    })
+                res.status(201).json({ image: image.result[0].data })
+            })
+            .catch((error) => {
+                console.error('Error:', error)
+                res.status(500).send('Error in fetching image')
+            })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('An error occurred while fetching the image')
+    }
 }

@@ -39,8 +39,11 @@ app.use(
 // Use CORS middleware so we can make requests across origins
 app.use(
     cors({
-        origin: 'https://d39oted90y97ty.cloudfront.net/*',
-        methods: ['GET'],
+        origin: [
+            'https://d39oted90y97ty.cloudfront.net',
+            'https://a2pejekyml.execute-api.us-east-1.amazonaws.com',
+        ],
+        methods: ['GET', 'POST'],
     })
 )
 // // Main route
