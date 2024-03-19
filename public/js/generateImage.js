@@ -50,7 +50,6 @@ document.getElementById('image-trigger').addEventListener('click', function () {
             gallery.appendChild(imgElement)
             element.innerText = 'Image Sent Successfully'
         })
-
         .catch((error) => {
             clearInterval(intervalId)
             clearTimeout(timeout)
