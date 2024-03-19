@@ -74,7 +74,7 @@ jobs:
               run: npm ci
 
             - name: Package Application
-              run: zip -r archive.zip ./* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*" "public/*" "model_AI/"
+              run: zip -r archive.zip ./* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*" "public/*" "model_AI/*"
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
