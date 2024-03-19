@@ -21,17 +21,20 @@ document.getElementById('image-trigger').addEventListener('click', function () {
         }, interval)
     }, 5000)
     // Perform the fetch request
-    fetch('http://localhost:3000/post-image-ai', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            id: params.get('id'),
-            text: document.getElementById('textInputAI').value,
-            platform: 'twitter',
-        }),
-    })
+    fetch(
+        'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/PROD/post-image-ai',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: params.get('id'),
+                text: document.getElementById('textInputAI').value,
+                platform: 'twitter',
+            }),
+        }
+    )
         .then((response) => response.json())
 
         .then(({ image }) => {
