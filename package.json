@@ -11,6 +11,7 @@
         "watch": "nodemon start  --watch",
         "format": "npx prettier . --write",
         "zip": "sh ./zip_files.sh",
+        "uploadAI": "cd ./model_AI/comfyui-truss && truss push",
         "lint": "npx eslint ."
     },
     "keywords": [],

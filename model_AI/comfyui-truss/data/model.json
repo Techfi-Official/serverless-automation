@@ -1,6 +1,6 @@
 [
-  {
-    "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors",
-    "path": "models/checkpoints/sd_xl_base_1.0.safetensors"
-  }
+    {
+        "url": "https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_6.31_BakedVae.safetensors",
+        "path": "models/checkpoints/DreamShaper_6.31_BakedVae_pruned.safetensors"
+    }
 ]
