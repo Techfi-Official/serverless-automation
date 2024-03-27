@@ -129,8 +129,8 @@ async function readDynamoDB(clientId) {
         const data = await ddbDocClient.send(command)
         // We may or may not get back any data (e.g., no item found for the given key).
         // If we get back an item (fragment), we'll return it.  Otherwise we'll return `undefined`.
-        console.log('hi', data)
-        return data?.Item
+        console.log('data 11', data)
+        return data?.Items
     } catch (err) {
         throw new Error('unable to read data from DynamoDB')
     }

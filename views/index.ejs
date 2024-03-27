@@ -2,79 +2,124 @@
 <html>
     <head>
         <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://api.replicate.com;">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tweet Edit Wizard</title>
         <!-- Bootstrap CSS -->
-        <link
-            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-            rel="stylesheet"
-        />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://d39oted90y97ty.cloudfront.net/css/style.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     </head>
     <body>
-        <div class="container mt-5">
-            <div id="image-gallery">
+        
+        <header class="custom-grey-bg p-1">
+                <div class="d-flex align-items-center">
+
+                    <div class="p-2">
+                        <div class="social-media-links text-black-50">
+                            <% if (platform === "twitter") { %>
+                                    <i class="bi bi-twitter-x"></i>
+                            <% } %>
+                            <% if (platform === "instagram") { %>
+                                    <i class="bi bi-instagram"></i>
+                            <% } %>
+                            <% if (platform === "linkedin") { %> 
+                                    <i class="bi bi-linkedin"></i>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="p-2 flex-grow-2 text-nowrap text-dark text-black-50">
+                        <h5 class="m-0">Post Edit Wizard</h5>
+                    </div>
+                    <div class="p-2 ms-auto">
+                        <button type="button" class="btn btn-outline-primary text-nowrap" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: 1rem;">  <i class="bi bi-chevron-double-up "></i> Preview Post</button>
+                    </div>
+                </div>
+        </header>
+        <hr class="border border-dark border-1 border-opacity-75 m-0">
+        <section class="container mt-5">
+            <h3>Post Images</h3>
+            <h6>Choose an image for your post</h6>
+            <div class="row" id="image-gallery">
                 <%if (images.length > 0) { %>
-                <% images.forEach(function(image) { %>
-                    <img
-                        class="w-25 h-25 d-inline-block"
-                        src="data:image/png;base64,<%= image %>"
-                        alt="sample"
-                    />
+                <% images.forEach(function(image, index) { %>
+                   <div class="col-6 col-sm-4 col-lg-3 p-2 position-relative image-container"> 
+                        <img
+                            class="rounded img-fluid img-thumbnail d-inline-block enchanted-img"
+                            src="data:image/png;base64,<%= image %>"
+                            alt="sample"
+                        />
+                        <i class="bi bi-check-circle-fill tick-icon"></i>
+                    </div> 
                 <% }); %> 
                 <% } %>
             </div>
-            <h1>Tweet Editing Wizard</h1>
-            <!-- Add spacing between h2 and h3 -->
             <br />
-            <h3>Last Generated Tweet</h3>
+            <div class="mb-2">
+                <input class="form-check-input" type="checkbox" id="flexCheckDefault" data-bs-toggle='collapse' data-bs-target="#collapseImage" aria-expanded="false" aria-controls="collapseImage">
+                <label class="form-check-label align-middle" for="flexCheckDefault" style="margin-left: 10px;">Regenerate image with a new prompt</label>
+            </div>
+             <div class="collapse" id="collapseImage">
+                <div class="d-flex flex-column">
+                    
+                        <textarea
+                            style="width: 100%;"
+                            class="form-control"
+                            name="textInputIMG"
+                            rows="3"
+                            min="0" 
+                            max="200"
+                            id="textInputIMG"
+                            /></textarea>
+                            <div class="d-flex justify-content-between">
+                                <span id="textInputIMGErr">error</span>
+                                <span id="textInputIMGValue">0/200 characters</span>    
+                            </div>  
+                </div>
+           
+            </div>    
+            <!-- Add spacing between h2 and h3 -->
+                <hr class="border border-dark border-2 border-opacity-75">
+            <br />
+            <h3>Post Body</h3>
             <!-- Show generated tweet bootstrap -->
             <form action="/PROD/edit-tweet" method="post">
                 <div class="form-group">
-                    <label for="edit_tweet">Manually edited post</label>
+                    <label class="mb-4" for="edit_tweet">Edit text for your post</label>
                     <div class="card">
-                        <input
+                        <textarea
+                            rows="5"
                             name="edit_tweet"
-                            type="text"
-                            class="card-text card-body"
+                            class="form-control"
                             id="edit_tweet"
-                            value="<%= tweet %>"
-                        />
+                        /><%= tweet %></textarea>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">
-                    Post tweet
-                </button>
+                
             </form>
             <br />
-            <section id="image-ai">
-                This is the AI input image.
-            </section>
-            <div class="card"  >
-                <img
-                    id="imageDisplay"
-                    class="card-img-top img-fluid img-thumbnail"
-                    src="https://d39oted90y97ty.cloudfront.net/img/image.jpeg"
-                    alt="Card image AI cap"
-                    style="width: 450px; align-self: center;"
-                />
-                <div class="card-body" style="align-items: flex-end; display:flex; flex-direction:column;">
-                    <input
-                    style="width: 100%;"
-                    type="text"
-                    class="card-text card-body"
-                    name="textInputAI"
-                    id="textInputAI"
-                    />
-                    <button id="image-trigger" class="btn btn-primary mb-5 mt-3" >
-                    Generate Image
-                    </button>
+            <div class="mb-2">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" data-bs-toggle="collapse" data-bs-target="#collapsePost" aria-expanded="false" aria-controls="collapsePost">
+                <label class="form-check-label align-middle" for="flexCheckDefault" style="margin-left: 10px;">Regenerate body with a new prompt</label>
+            </div>
+            <div class="collapse" id="collapsePost">
+                <div class="d-flex flex-column align-items-end">
+                    <textarea
+                        style="width: 100%;"
+                        class="form-control"
+                        name="textInputPOST"
+                        rows="3"
+                        id="textInputPOST"
+                        /></textarea>
+                        <p id="textInputPOSTValue">0/200 characters</p>
                 </div>
-            </div>    
-            
+            </div>
             <br />
-            <form action="/PROD/new-tweet" method="post">
-                <h3>Change ChatGPT Instructions</h3>
+            <!-- <form action="/PROD/new-tweet" method="post"> -->
+                <!-- <h3>Change ChatGPT Instructions</h3> -->
                 <!-- Text Input for Text Creation Prompt -->
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="instructions">Text Description Prompt</label>
                     <textarea
                         name="instructions"
@@ -83,26 +128,39 @@
                         rows="3"
                         placeholder="Enter your text here"
                     ></textarea>
-                </div>
+                </div> -->
 
-                <input
+                <!-- <input
                     name="previous_tweet"
                     type="hidden"
                     id="previous_tweet"
                     value="<%= tweet %>"
-                />
+                /> -->
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">
+                <!-- <button type="submit" class="btn btn-primary">
                     Submit to AI
-                </button>
-            </form>
-        </div>
+                </button> -->
+            <!-- </form> -->
+        </section>
+        <footer class="custom-grey-bg p-3 position-sticky sticky-bottom">
+                <div class="p-1 d-flex justify-content-end gap-4">
+                    <button type="submit" class="btn btn-outline-primary">
+                            Regenerate Post
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                            Publish Post
+                    </button>
+                </div>
+        </footer>
 
-        <!-- Custom JS-->
-        <script src="https://d39oted90y97ty.cloudfront.net/js/generateImage.js"></script>
+        
         <!-- Bootstrap JS and its dependencies -->
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <!-- Custom JS-->
+        <script src="https://d39oted90y97ty.cloudfront.net/js/index.js"></script>
+        <script src="https://d39oted90y97ty.cloudfront.net/js/generateImage.js"></script>
     </body>
 </html>

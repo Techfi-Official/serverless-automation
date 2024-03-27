@@ -5,7 +5,7 @@ const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports.getDataRenderHTML = async (req, res) => {
     try {
-        let tableData = ''
+        let tableData = null
         let outputBuffer = []
         if (req.query.id) {
             const s3 = new S3BucketAndDynamoDB(req.query.id)
@@ -40,8 +40,11 @@ module.exports.getDataRenderHTML = async (req, res) => {
         // Send the converted image buffer as a response
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
-            tweet: tableData?.instruction ?? 'N/A',
-            images: outputBuffer.map((buffer) => buffer.toString('base64')),
+            tweet: tableData[0].instruction ?? 'N/A',
+            platform: tableData[0].platform,
+            images: outputBuffer
+                .map((buffer) => buffer.toString('base64'))
+                .slice(0, 4),
         })
     } catch (err) {
         res.status(500).send(`Image Error Process => ${err.message}`)
