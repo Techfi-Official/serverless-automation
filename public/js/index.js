@@ -22,17 +22,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const textInputIMGValue = document.getElementById('textInputIMGValue')
     const textInputPOSTValue = document.getElementById('textInputPOSTValue')
     const maxLength = 200
-    function validateForm(dataForm, output) {
+    function validateForm(dataForm, output, err) {
         // --- Prevent the user from pasting more than the maxLength ---
         dataForm.addEventListener('paste', function (event) {
             const clipboardData = event.clipboardData || window.clipboardData
             const pastedText = clipboardData.getData('text/plain')
             if (dataForm.value.length + pastedText.length > 200) {
-                // eslint-disable-next-line no-undef
-                toastr.error(
-                    'Cannot paste text as it would exceed the 200 character limit!',
-                    'Error'
-                )
+                dataForm.classList.add('is-invalid')
+                document.getElementById(err).innerText =
+                    'Cannot type text as it would exceed the 200 character limit!'
+
                 event.preventDefault()
             }
         })
@@ -51,11 +50,9 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Enter', e.key)
             if (!isControlKey && currentLength >= maxLength) {
                 e.preventDefault()
-                // eslint-disable-next-line no-undef
-                toastr.error(
-                    'Cannot paste text as it would exceed the 200 character limit!',
-                    'Error'
-                )
+                dataForm.classList.add('is-invalid')
+                document.getElementById(err).innerText =
+                    'Cannot type text as it would exceed the 200 character limit!'
             }
         })
 
@@ -64,9 +61,11 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('e', e.target.value)
             output.innerText =
                 e.target.value.length + `/${maxLength} characters`
+            document.getElementById(err).innerText = null
+            dataForm.classList.remove('is-invalid')
         })
     }
 
-    validateForm(textInputIMG, textInputIMGValue)
-    validateForm(textInputPOST, textInputPOSTValue)
+    validateForm(textInputIMG, textInputIMGValue, 'textInputIMGErr')
+    validateForm(textInputPOST, textInputPOSTValue, 'textInputPOSTErr')
 })
