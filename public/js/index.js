@@ -1,10 +1,6 @@
 /* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', function () {
     const imageContainer = document.querySelectorAll('.image-container')
-    toastr.options.timeOut = 3000
-    toastr.options.closeEasing = 'swing'
-    toastr.options.closeButton = true
-    toastr.options.preventDuplicates = true
 
     imageContainer.forEach((container) => {
         container.addEventListener('click', function () {
