@@ -9,6 +9,18 @@ document.addEventListener('DOMContentLoaded', function () {
             )
             this.classList.toggle('image-selected')
             const selectedImageUrl = this.querySelector('img').src
+            const img = document.createElement('img')
+            const imgToRemove = document.getElementById('dynamicImg')
+            if (imgToRemove) {
+                document.getElementById('reviewImg').removeChild(imgToRemove)
+            }
+            img.src = selectedImageUrl
+            img.alt = 'selected_image'
+            img.id = 'dynamicImg'
+            img.style.borderRadius = '20px'
+            img.style.width = '100%'
+            document.getElementById('reviewImg').appendChild(img)
+
             console.log('Selected Image URL:', selectedImageUrl)
         })
     })

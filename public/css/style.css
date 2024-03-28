@@ -72,3 +72,85 @@ input[type='checkbox'] {
     opacity: 1;
     transition: 0.5s linear;
 }
+
+.navbar-search-icon {
+    color: #66757f;
+}
+
+.navbar-form {
+    margin-right: 15px;
+}
+
+.navbar-user-dropdown {
+    margin-right: 15px;
+}
+/* END: Top Navbar elements' styles */
+
+/* Main avatar */
+.avatar-container {
+    bottom: -87px;
+    left: 10px;
+    position: absolute;
+    transition: bottom 0.3s;
+    z-index: 3;
+}
+
+.avatar {
+    background: #fff;
+    background-image: url(https://pbs.twimg.com/profile_images/679974972278849537/bzzb-6H4_400x400.jpg);
+    border: 5px solid #fff;
+    border-radius: 50%;
+    height: 200px;
+    position: relative;
+    width: 200px;
+}
+
+.tweet-to-btn {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+/* END: Left column*/
+
+.tweet-list {
+    list-style: none;
+    margin: 8px 4px 0;
+    padding: 0;
+}
+.tweet-card {
+    background-color: #fff;
+    border: 1px solid #e6ecf0;
+    min-height: 52px;
+    padding: 9px 12px;
+}
+
+.tweet-content {
+    margin-left: 58px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: normal;
+}
+.tweet-card-avatar {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    float: left;
+    margin-left: -50px;
+    margin-top: -20px;
+}
+.tweet-footer {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.tweet-footer-btn {
+    margin-right: 30px;
+}
+.tweet-footer-btn i,
+.tweet-footer-btn span {
+    color: #657786;
+    font-size: 16px;
+}
+.tweet-footer-btn span {
+    margin-left: 3px;
+}

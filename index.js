@@ -27,6 +27,7 @@ app.use(
                 'data:',
                 'blob:',
                 'https://d39oted90y97ty.cloudfront.net',
+                'https://idsb.tmgrup.com.tr/ly/uploads/images/2023/11/14/301015.jpg',
             ],
             'script-src': [
                 "'self'",
