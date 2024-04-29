@@ -1,6 +1,10 @@
 [
     {
-        "url": "https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_6.31_BakedVae.safetensors",
-        "path": "models/checkpoints/DreamShaper_6.31_BakedVae_pruned.safetensors"
+        "url": "https://huggingface.co/RunDiffusion/Juggernaut-XL-v9/resolve/main/Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors",
+        "path": "models/checkpoints/Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors"
+    },
+    {
+        "url": "https://huggingface.co/marinalaurel/mj/resolve/main/MJ52.safetensors",
+        "path": "models/loras/MJ52.safetensors"
     }
 ]

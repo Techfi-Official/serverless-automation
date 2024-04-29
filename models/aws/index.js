@@ -51,7 +51,8 @@ const streamToBuffer = (stream) =>
 // Reads a fragment's data from S3 and returns (Promise<Buffer>)
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#getting-a-file-from-an-amazon-s3-bucket
 // eslint-disable-next-line no-unused-vars
-async function readS3BucketData(clientId) {
+// This function only returns all S3 buckets based on only ClientId
+async function readALLS3BucketData(clientId) {
     // Create the PUT API params from our details
 
     const params = {
@@ -67,6 +68,7 @@ async function readS3BucketData(clientId) {
         // Get the object from the Amazon S3 bucket. It is returned as a ReadableStream.
 
         const { Contents } = await s3Client.send(command)
+        console.log('Contents', Contents)
         if (Contents?.length > 0) {
             const filteredContentsImageKeys = Contents.map(
                 (content) => content.Key
@@ -74,19 +76,47 @@ async function readS3BucketData(clientId) {
             // Convert the ReadableStream to a Buffer
             // Fetch all image buffers
             const imageBuffers = await Promise.all(
-                filteredContentsImageKeys.map((key) => {
+                filteredContentsImageKeys.map(async (key) => {
                     const params = {
                         Bucket: process.env.AWS_S3_BUCKET_NAME,
                         Key: key,
                     }
                     const command = new GetObjectCommand(params)
-                    return s3Client.send(command)
+                    return await s3Client.send(command)
                 })
             )
             return imageBuffers.map((img) => ({
                 metaData: streamToBuffer(img.Body),
             }))
         } else return []
+    } catch (err) {
+        console.log('err', err)
+        throw new Error('unable to read s3 data')
+    }
+}
+
+async function readSpecificS3BucketData(clientId, imageIds) {
+    try {
+        // Convert the ReadableStream to a Buffer
+        // Fetch all image buffers
+        const imageBuffers = await Promise.all(
+            imageIds.map(async (imageId) => {
+                const params = {
+                    Bucket: process.env.AWS_S3_BUCKET_NAME,
+                    Key: `${clientId}/${imageId}`,
+                }
+                const command = new GetObjectCommand(params)
+                return { src: await s3Client.send(command), key: imageId }
+            })
+        )
+
+        return imageBuffers.map(({ src, key }) => {
+            console.log('src', src.Body)
+            return {
+                metaData: streamToBuffer(src.Body),
+                key,
+            }
+        })
     } catch (err) {
         console.log('err', err)
         throw new Error('unable to read s3 data')
@@ -110,17 +140,20 @@ async function deleteS3BucketData(ownerId, id) {
 
 async function readDynamoDB(clientId) {
     // Configure our GET params, with the name of the table and key (partition key + sort key)
+
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+        IndexName: 'clientIdCreatedAtIndex',
         KeyConditionExpression: 'clientId = :clientId',
         ExpressionAttributeValues: {
             ':clientId': clientId,
         },
-        ProjectionExpression: 'imageId, platform, instruction',
+        ProjectionExpression: 'imageId, platform, instruction, topic',
+        ScanIndexForward: global.sharedData?.isSorted ?? false,
+        Limit: global.sharedData?.limit ?? 10,
     }
 
     // Create a GET command to send to DynamoDBs
-    console.log('params', params)
     const command = new QueryCommand(params)
 
     try {
@@ -129,14 +162,13 @@ async function readDynamoDB(clientId) {
         const data = await ddbDocClient.send(command)
         // We may or may not get back any data (e.g., no item found for the given key).
         // If we get back an item (fragment), we'll return it.  Otherwise we'll return `undefined`.
-        console.log('data 11', data)
         return data?.Items
     } catch (err) {
         throw new Error('unable to read data from DynamoDB')
     }
 }
 
-async function writeDynamoDB(clientId, imageId, instruction, platform) {
+async function writeDynamoDB(clientId, imageId, instruction, platform, topic) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
@@ -144,7 +176,10 @@ async function writeDynamoDB(clientId, imageId, instruction, platform) {
             clientId: clientId,
             imageId: imageId,
             platform: platform,
+            topic: topic,
             instruction: instruction,
+            createdAt: new Date().toISOString(), // ISO string format timestamp
+            updatedAt: new Date().toISOString(),
         },
     }
 
@@ -159,7 +194,8 @@ async function writeDynamoDB(clientId, imageId, instruction, platform) {
 }
 
 module.exports.writeS3BucketData = writeS3BucketData
-module.exports.readS3BucketData = readS3BucketData
+module.exports.readALLS3BucketData = readALLS3BucketData
 module.exports.deleteS3BucketData = deleteS3BucketData
 module.exports.readDynamoDB = readDynamoDB
 module.exports.writeDynamoDB = writeDynamoDB
+module.exports.readSpecificS3BucketData = readSpecificS3BucketData

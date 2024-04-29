@@ -44,7 +44,8 @@ def download_tempfile(file_url, filename):
         response = requests.get(file_url)
         response.raise_for_status()
         filetype = filename.split(".")[-1]
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=f".{filetype}")
+        temp_file = tempfile.NamedTemporaryFile(
+            delete=False, suffix=f".{filetype}")
         temp_file.write(response.content)
         return temp_file.name, temp_file
     except Exception as e:
@@ -77,7 +78,8 @@ def add_custom_node(git_url: str):
 def setup_comfyui(original_working_directory, data_dir):
 
     try:
-        model_json = os.path.join(original_working_directory, data_dir, "model.json")
+        model_json = os.path.join(
+            original_working_directory, data_dir, "model.json")
         with open(model_json, "r") as file:
             data = json.load(file)
 
@@ -92,13 +94,15 @@ def setup_comfyui(original_working_directory, data_dir):
                     # Download checkpoints, loras, vaes, etc.
                     download_model(
                         model_url=model.get("url"),
-                        destination_path=os.path.join(COMFYUI_DIR, model.get("path")),
+                        destination_path=os.path.join(
+                            COMFYUI_DIR, model.get("path")),
                     )
 
         logging.debug("Finished downloading models!")
 
         # run the comfy-ui server
-        subprocess.run([sys.executable, "main.py"], cwd=COMFYUI_DIR, check=True)
+        subprocess.run([sys.executable, "main.py"],
+                       cwd=COMFYUI_DIR, check=True)
 
     except Exception as e:
         logging.error(e)
@@ -108,7 +112,8 @@ def setup_comfyui(original_working_directory, data_dir):
 def queue_prompt(prompt, client_id, server_address):
     p = {"prompt": prompt, "client_id": client_id}
     data = json.dumps(p).encode("utf-8")
-    req = urllib.request.Request("http://{}/prompt".format(server_address), data=data)
+    req = urllib.request.Request(
+        "http://{}/prompt".format(server_address), data=data)
     return json.loads(urllib.request.urlopen(req).read())
 
 

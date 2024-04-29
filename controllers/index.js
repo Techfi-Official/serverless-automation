@@ -1,10 +1,21 @@
 const express = require('express')
+const { authUserApiKey } = require('./utils')
 const router = express.Router()
+const {
+    postDataAndImageAI,
+    getDataRenderHTML,
+    postWebhook,
+    wakeAIModel,
+} = require('./api')
 
-router.get(['/'], require('./api').getDataRenderHTML)
+router.get(['/'], getDataRenderHTML)
 
-router.post(['/post-data'], require('./api').postData)
+router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
 
-router.post(['/post-image-ai'], require('./api').postImageAI)
+router.post(['/post-data-image-ai'], authUserApiKey, postDataAndImageAI)
+
+router.post(['/post-webhook'], postWebhook)
+
+// router.post(['/post-image-ai'], require('./api').postImageAI)
 
 module.exports = router

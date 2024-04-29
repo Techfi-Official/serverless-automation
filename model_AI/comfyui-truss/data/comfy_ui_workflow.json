@@ -7,7 +7,7 @@
             "sampler_name": "euler",
             "scheduler": "normal",
             "denoise": 1,
-            "model": ["4", 0],
+            "model": ["10", 0],
             "positive": ["6", 0],
             "negative": ["7", 0],
             "latent_image": ["5", 0]
@@ -19,7 +19,7 @@
     },
     "4": {
         "inputs": {
-            "ckpt_name": "DreamShaper_6.31_BakedVae_pruned.safetensors"
+            "ckpt_name": "Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors"
         },
         "class_type": "CheckpointLoaderSimple",
         "_meta": {
@@ -30,7 +30,7 @@
         "inputs": {
             "width": 512,
             "height": 512,
-            "batch_size": 1
+            "batch_size": 3
         },
         "class_type": "EmptyLatentImage",
         "_meta": {
@@ -40,7 +40,7 @@
     "6": {
         "inputs": {
             "text": "{{positive_prompt}}",
-            "clip": ["4", 1]
+            "clip": ["10", 1]
         },
         "class_type": "CLIPTextEncode",
         "_meta": {
@@ -50,7 +50,7 @@
     "7": {
         "inputs": {
             "text": "{{negative_prompt}}",
-            "clip": ["4", 1]
+            "clip": ["10", 1]
         },
         "class_type": "CLIPTextEncode",
         "_meta": {
@@ -75,6 +75,19 @@
         "class_type": "SaveImage",
         "_meta": {
             "title": "Save Image"
+        }
+    },
+    "10": {
+        "inputs": {
+            "lora_name": "MJ52.safetensors",
+            "strength_model": 1,
+            "strength_clip": 1,
+            "model": ["4", 0],
+            "clip": ["4", 1]
+        },
+        "class_type": "LoraLoader",
+        "_meta": {
+            "title": "Load LoRA"
         }
     }
 }

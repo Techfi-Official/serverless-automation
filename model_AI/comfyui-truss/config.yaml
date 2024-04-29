@@ -1,27 +1,32 @@
 base_image:
-  image: bolabaseten/comfyui-truss-base:6a7bc35
-  python_executable_path: /usr/bin/python3
+    image: bolabaseten/comfyui-truss-base:6a7bc35
+    python_executable_path: /usr/bin/python3
 description: Deploy a ComfyUI workflow as a Truss
 environment_variables: {}
 external_package_dirs: []
 model_metadata:
-  example_model_input:
-    workflow_values:
-      negative_prompt: blurry, text, low quality
-      positive_prompt: An igloo on a snowy day, 4k, hd
-      seed: 1000000
+    example_model_input:
+        workflow_values:
+            negative_prompt: blurry, text, low quality
+            positive_prompt: An igloo on a snowy day, 4k, hd
+            seed: 1000000
 model_name: ComfyUI Workflow
+model_cache:
+    - repo_id: s3://comfyui-image/comfy-ui/models/
+      allow_patterns:
+          - '*.json'
+          - '*.safetensors'
 python_version: py39
 requirements:
-  - websocket-client==1.6.4
-  - accelerate==0.23.0
-  - opencv-python
+    - websocket-client==1.6.4
+    - accelerate==0.23.0
+    - opencv-python
 resources:
-  accelerator: A10G
-  cpu: "3"
-  memory: 14Gi
-  use_gpu: true
+    accelerator: A10G
+    cpu: '3'
+    memory: 14Gi
+    use_gpu: true
 secrets: {}
 system_packages:
-  - ffmpeg
-  - libgl1-mesa-glx
+    - ffmpeg
+    - libgl1-mesa-glx

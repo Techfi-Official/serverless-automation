@@ -1,15 +1,17 @@
 const {
-    readS3BucketData,
+    readALLS3BucketData,
     readDynamoDB,
     writeDynamoDB,
     writeS3BucketData,
+    readSpecificS3BucketData,
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(clientId, imageId, instruction, platform) {
+    constructor(clientId, imageId, instruction, platform, topic) {
         this.imageId = imageId || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
+        this.topic = topic || ''
         if (clientId != null) {
             this.clientId = clientId
         } else {
@@ -18,8 +20,13 @@ class S3BucketAndDynamoDB {
     }
 
     // ---- GET & POST S3BUCKET
-    async getS3Data() {
-        return await readS3BucketData(this.clientId)
+    async getAllS3Data() {
+        return await readALLS3BucketData(this.clientId)
+    }
+
+    // ---- GET & POST S3BUCKET
+    async getSortedS3Data(data) {
+        return await readSpecificS3BucketData(this.clientId, data)
     }
 
     async postS3Data(data) {
@@ -38,7 +45,8 @@ class S3BucketAndDynamoDB {
             this.clientId,
             this.imageId,
             this.instruction,
-            this.platform
+            this.platform,
+            this.topic
         )
     }
 }
