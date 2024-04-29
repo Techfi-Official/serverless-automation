@@ -63,7 +63,6 @@ app.use(
 // })
 app.post('/new-tweet', async (req, res) => {
     const tweetInstructions = req.body || null
-    console.log(`tweetInstructions`, tweetInstructions)
     //write fetch function to post tweet
     // if tweetInstructions is null, return error
     if (!tweetInstructions) {
@@ -85,8 +84,6 @@ app.post('/new-tweet', async (req, res) => {
                     '<h3>Message sent successfully please check your Email Address</h3>'
                 )
         } catch (error) {
-            console.log(`error`, error)
-            console.log(tweetInstructions)
             res.status(500).send(
                 'Something went wrong, please contact to <b>techfi1992@gmail.com</b>'
             )
@@ -98,7 +95,6 @@ app.use('/', require('./controllers'))
 
 app.post('/edit-tweet', async (req, res) => {
     const newTweet = req.body || null
-    console.log(`newTweet`, newTweet)
     //write fetch function to post tweet
     // if newTweet is null, return error
     if (!newTweet) {
@@ -120,8 +116,6 @@ app.post('/edit-tweet', async (req, res) => {
                     '<h3>Message sent successfully please check your Email Address</h3>'
                 )
         } catch (error) {
-            console.log(`error`, error)
-            console.log(newTweet)
             res.status(500).send(
                 'Something went wrong, please contact to <b>techfi1992@gmail.com</b>'
             )
@@ -132,7 +126,9 @@ const server = awsServerlessExpress.createServer(app)
 
 if (process.env.NODE_DEV)
     app.listen(PORT, function (err) {
+        // eslint-disable-next-line no-console
         if (err) console.log('Error in server setup')
+        // eslint-disable-next-line no-console
         console.log('Server listening on Port', PORT)
     })
 else
