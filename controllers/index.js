@@ -6,7 +6,7 @@ const {
     getDataRenderHTML,
     postWebhook,
     wakeAIModel,
-    sendTweetEmail,
+    sendEmail,
 } = require('./api')
 
 router.get(['/'], getDataRenderHTML)
@@ -15,7 +15,7 @@ router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
 
 router.post(['/post-data-image-ai'], authUserApiKey, postDataAndImageAI)
 
-router.post(['/send-tweet-email'], authUserApiKey, sendTweetEmail)
+router.post(['/send-email'], authUserApiKey, sendEmail)
 
 router.post(['/post-webhook'], postWebhook)
 

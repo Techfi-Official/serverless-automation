@@ -183,11 +183,25 @@ module.exports.wakeAIModel = async (req, res) => {
         })
 }
 
-module.exports.sendTweetEmail = async (req, res) => {
-    const { images, approveLink, disapproveLink, postBody, email } = req.body;
+module.exports.sendEmail = async (req, res) => {
+    const { images, approveLink, disapproveLink, postBody, email, platform } = req.body;
     // Basic validation
-    if (!approveLink || !disapproveLink || !email || !postBody) {
+    if (!approveLink || !disapproveLink || !email || !postBody || !platform) {
         return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    // Define a mapping from platforms to their respective email template IDs
+    const templateIdMap = {
+        'twitter': process.env.TWEET_EMAIL_TEMPLATE_ID,
+        'facebook': process.env.FACEBOOK_EMAIL_TEMPLATE_ID,
+        'instagram': process.env.INSTAGRAM_EMAIL_TEMPLATE_ID,
+        'linkedin': process.env.LINKEDIN_EMAIL_TEMPLATE_ID
+    };
+
+    const platformTemplateId = templateIdMap[platform]; // Fetch the template ID based on the platform
+
+    if (!platformTemplateId) {
+        return res.status(400).json({ message: 'Invalid platform' });
     }
 
     try {
