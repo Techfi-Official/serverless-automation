@@ -1,5 +1,7 @@
 const axios = require('axios')
 const { nanoid } = require('nanoid')
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
@@ -179,4 +181,37 @@ module.exports.wakeAIModel = async (req, res) => {
             console.error('Error:', error)
             res.status(500).send('Error in calling API ' + error.message)
         })
+}
+
+module.exports.sendTweetEmail = async (req, res) => {
+    const { images, approveLink, disapproveLink, postBody, email } = req.body;
+    // Basic validation
+    if (!approveLink || !disapproveLink || !email || !postBody) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        // Prepare the email data using the SendGrid template
+        const msg = {
+            to: email,
+            from: process.env.EMAIL_FROM,
+            templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
+            dynamicTemplateData: {
+                subject: "Check Your New Generated Tweet!",
+                images: images? images : [],
+                approveLink,
+                disapproveLink,
+                body
+            },
+        };
+
+        // Send email
+        await sgMail.send(msg);
+
+        res.status(200).json({ message: 'Email sent successfully!' });
+    } catch (error) {
+        console.error('Email sending error:', error);
+        res.status(500).json({ message: 'Failed to send email', error: error.message });
+    }
+
 }
