@@ -184,7 +184,7 @@ module.exports.wakeAIModel = async (req, res) => {
 }
 
 module.exports.sendEmail = async (req, res) => {
-    const { imageSrc, approveLink, disapproveLink, postBody, email, platform } = req.body;
+    const { imageSrc, approveLink, disapproveLink, editLink, postBody, email, platform } = req.body;
     // Basic validation
     if (!approveLink || !disapproveLink || !email || !postBody || !platform) {
         return res.status(400).json({ message: 'Missing required fields' });
@@ -215,6 +215,7 @@ module.exports.sendEmail = async (req, res) => {
                 imageSrc: imageSrc ? imageSrc : null,
                 approveLink,
                 disapproveLink,
+                editLink,
                 postBody
             },
         };
