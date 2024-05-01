@@ -184,7 +184,7 @@ module.exports.wakeAIModel = async (req, res) => {
 }
 
 module.exports.sendEmail = async (req, res) => {
-    const { images, approveLink, disapproveLink, postBody, email, platform } = req.body;
+    const { imageSrc, approveLink, disapproveLink, postBody, email, platform } = req.body;
     // Basic validation
     if (!approveLink || !disapproveLink || !email || !postBody || !platform) {
         return res.status(400).json({ message: 'Missing required fields' });
@@ -212,10 +212,10 @@ module.exports.sendEmail = async (req, res) => {
             templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
             dynamicTemplateData: {
                 subject: "Check Your New Generated Tweet!",
-                images: images? images : [],
+                imageSrc: imageSrc ? imageSrc : null,
                 approveLink,
                 disapproveLink,
-                body
+                postBody
             },
         };
 
@@ -224,7 +224,7 @@ module.exports.sendEmail = async (req, res) => {
 
         res.status(200).json({ message: 'Email sent successfully!' });
     } catch (error) {
-        console.error('Email sending error:', error);
+        // console.error('Email sending error:', error);        
         res.status(500).json({ message: 'Failed to send email', error: error.message });
     }
 
