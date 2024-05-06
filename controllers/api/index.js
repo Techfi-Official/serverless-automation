@@ -1,18 +1,19 @@
 const axios = require('axios')
 const { nanoid } = require('nanoid')
 const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports.getDataRenderHTML = async (req, res) => {
+    let tableData = null
+    let outputBuffer = []
     try {
-        let tableData = null
-        let outputBuffer = []
         if (req.query.id) {
             const s3 = new S3BucketAndDynamoDB(req.query.id)
             global.sharedData = { limit: 4, isSorted: false }
             tableData = await s3.getDynamoDBdata()
+
             const s3Data = await s3.getSortedS3Data(
                 tableData.map((item) => item.imageId)
             )
@@ -47,7 +48,12 @@ module.exports.getDataRenderHTML = async (req, res) => {
             images: outputBuffer.map((buffer) => buffer.toString('base64')),
         })
     } catch (err) {
-        res.status(500).send(`Image Error Process => ${err.message}`)
+        res.render('index', {
+            title: 'Server-Side Rendered Page on AWS Lambda',
+            tweet: tableData[0].instruction ?? 'N/A',
+            platform: tableData[0].platform,
+            images: [],
+        })
     }
 }
 
@@ -83,7 +89,8 @@ module.exports.postDataAndImageAI = async (req, res) => {
         )
         .then(async (response) => {
             const image = await response.data
-            console.log('Image generated : ', image.result.length)
+            let imageURLs = []
+            console.log('Image generated : ', image)
             try {
                 for (const imgData of image.result) {
                     const instanceData = new S3BucketAndDynamoDB(
@@ -97,13 +104,11 @@ module.exports.postDataAndImageAI = async (req, res) => {
                     await instanceData.postS3Data(
                         Buffer.from(imgData.data, 'base64')
                     )
-                }
 
-                return res
-                    .status(201)
-                    .send(
-                        `<h3>Message sent successfully ${data?.instruction}</h3>`
-                    )
+                    imageURLs.push(instanceData.getS3URLData())
+                }
+                console.log('Image generated : ', imageURLs)
+                return res.status(201).json(JSON.stringify({ imageURLs }))
             } catch (error) {
                 console.log(`error`, error)
                 res.status(500).end(
@@ -184,24 +189,32 @@ module.exports.wakeAIModel = async (req, res) => {
 }
 
 module.exports.sendEmail = async (req, res) => {
-    const { imageSrc, approveLink, disapproveLink, editLink, postBody, email, platform } = req.body;
+    const {
+        imageSrc,
+        approveLink,
+        disapproveLink,
+        editLink,
+        postBody,
+        email,
+        platform,
+    } = req.body
     // Basic validation
     if (!approveLink || !disapproveLink || !email || !postBody || !platform) {
-        return res.status(400).json({ message: 'Missing required fields' });
+        return res.status(400).json({ message: 'Missing required fields' })
     }
 
     // Define a mapping from platforms to their respective email template IDs
     const templateIdMap = {
-        'twitter': process.env.TWEET_EMAIL_TEMPLATE_ID,
-        'facebook': process.env.FACEBOOK_EMAIL_TEMPLATE_ID,
-        'instagram': process.env.INSTAGRAM_EMAIL_TEMPLATE_ID,
-        'linkedin': process.env.LINKEDIN_EMAIL_TEMPLATE_ID
-    };
+        twitter: process.env.TWEET_EMAIL_TEMPLATE_ID,
+        facebook: process.env.FACEBOOK_EMAIL_TEMPLATE_ID,
+        instagram: process.env.INSTAGRAM_EMAIL_TEMPLATE_ID,
+        linkedin: process.env.LINKEDIN_EMAIL_TEMPLATE_ID,
+    }
 
-    const platformTemplateId = templateIdMap[platform]; // Fetch the template ID based on the platform
+    const platformTemplateId = templateIdMap[platform] // Fetch the template ID based on the platform
 
     if (!platformTemplateId) {
-        return res.status(400).json({ message: 'Invalid platform' });
+        return res.status(400).json({ message: 'Invalid platform' })
     }
 
     try {
@@ -211,22 +224,24 @@ module.exports.sendEmail = async (req, res) => {
             from: process.env.EMAIL_FROM,
             templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
             dynamicTemplateData: {
-                subject: "Check Your New Generated Tweet!",
+                subject: 'Check Your New Generated Tweet!',
                 imageSrc: imageSrc ? imageSrc : null,
                 approveLink,
                 disapproveLink,
                 editLink,
-                postBody
+                postBody,
             },
-        };
+        }
 
         // Send email
-        await sgMail.send(msg);
+        await sgMail.send(msg)
 
-        res.status(200).json({ message: 'Email sent successfully!' });
+        res.status(200).json({ message: 'Email sent successfully!' })
     } catch (error) {
-        // console.error('Email sending error:', error);        
-        res.status(500).json({ message: 'Failed to send email', error: error.message });
+        // console.error('Email sending error:', error);
+        res.status(500).json({
+            message: 'Failed to send email',
+            error: error.message,
+        })
     }
-
 }

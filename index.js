@@ -5,6 +5,7 @@ const path = require('path')
 const cors = require('cors')
 const helmet = require('helmet')
 const axios = require('axios')
+const helmetConnect = require('./utils/connectionHelmet')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
@@ -22,23 +23,7 @@ app.use(
     helmet.contentSecurityPolicy({
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            'img-src': [
-                "'self'",
-                'data:',
-                'blob:',
-                'https://d39oted90y97ty.cloudfront.net',
-                'https://idsb.tmgrup.com.tr/ly/uploads/images/2023/11/14/301015.jpg',
-            ],
-            'script-src': [
-                "'self'",
-                'https://d39oted90y97ty.cloudfront.net',
-                'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/PROD/post-image-ai',
-                'https://code.jquery.com/jquery-3.6.0.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js',
-                'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css',
-                'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js',
-            ],
+            ...helmetConnect,
         },
     })
 )

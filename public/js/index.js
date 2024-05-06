@@ -20,8 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
             img.style.borderRadius = '20px'
             img.style.width = '100%'
             document.getElementById('reviewImg').appendChild(img)
-
-            console.log('Selected Image URL:', selectedImageUrl)
         })
     })
 
@@ -55,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 'ArrowUp',
                 'ArrowDown',
             ].includes(e.key)
-            console.log('Enter', e.key)
             if (!isControlKey && currentLength >= maxLength) {
                 e.preventDefault()
                 dataForm.classList.add('is-invalid')
@@ -66,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // --- Calculate the length of the input field Characters ---
         dataForm.addEventListener('input', function (e) {
-            console.log('e', e.target.value)
             output.innerText =
                 e.target.value.length + `/${maxLength} characters`
             document.getElementById(err).innerText = null
@@ -76,4 +72,86 @@ document.addEventListener('DOMContentLoaded', function () {
 
     validateForm(textInputIMG, textInputIMGValue, 'textInputIMGErr')
     validateForm(textInputPOST, textInputPOSTValue, 'textInputPOSTErr')
+    document
+        .getElementById('publishPost')
+        .addEventListener('click', function () {
+            Swal.fire({
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#d33',
+                title: 'Publish the post',
+                imageUrl: document.getElementById('dynamicImg').src,
+                imageAlt: 'post image',
+                text: 'Are you sure you want to publish this post to twitter?',
+                icon: 'warning',
+                confirmButtonText: 'Publish',
+                showCancelButton: true,
+                reverseButtons: true,
+                showLoaderOnConfirm: true,
+
+                imageWidth:
+                    document.getElementById('dynamicImg').clientWidth - 200,
+                imageHeight:
+                    document.getElementById('dynamicImg').clientHeight - 200,
+                preConfirm: async () => {
+                    try {
+                        console.log(
+                            'img',
+                            document.getElementById('edit_tweet').value
+                        )
+                        const githubUrl = `https://cloud.activepieces.com/api/v1/webhooks/Ts3WLRwxW6kMVAws5bANXd`
+
+                        const response = await fetch(githubUrl, {
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                isPublished: true,
+                                instruction: '',
+                                image: document.getElementById('dynamicImg')
+                                    .src,
+                            }),
+                        })
+                        if (!response.ok) {
+                            return Swal.showValidationMessage(
+                                `${JSON.stringify(await response.json())}`
+                            )
+                        }
+                        return await response.json()
+                    } catch (error) {
+                        Swal.showValidationMessage(`Request failed: ${error}`)
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading(),
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(result)
+                    let timerInterval = null
+                    let percent = 0
+                    Swal.fire({
+                        title: `Posting content to twitter`,
+                        html: `Loading <span id="loading"></span>&#37;`,
+                        text: `${result.value}`,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            const timer = document.getElementById('loading')
+                            Swal.showLoading()
+                            timerInterval = setInterval(() => {
+                                percent += 5
+                                timer.textContent = percent
+                            }, 150)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        },
+                        allowOutsideClick: () => !Swal.isLoading(),
+                    }).then(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Post has been saved to twitter',
+                            showConfirmButton: false,
+                            timer: 1500,
+                        })
+                    })
+                }
+            })
+        })
 })

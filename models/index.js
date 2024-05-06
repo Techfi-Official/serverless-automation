@@ -4,6 +4,7 @@ const {
     writeDynamoDB,
     writeS3BucketData,
     readSpecificS3BucketData,
+    readS3URLBucketData,
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
@@ -25,13 +26,17 @@ class S3BucketAndDynamoDB {
     }
 
     // ---- GET & POST S3BUCKET
-    async getSortedS3Data(data) {
-        return await readSpecificS3BucketData(this.clientId, data)
+    async getSortedS3Data(imageId) {
+        return await readSpecificS3BucketData(this.clientId, imageId)
     }
 
     async postS3Data(data) {
         this.writeDynamoDB()
         return await writeS3BucketData(this.clientId, this.imageId, data)
+    }
+
+    getS3URLData() {
+        return readS3URLBucketData(this.clientId, this.imageId)
     }
 
     // --------------------------------

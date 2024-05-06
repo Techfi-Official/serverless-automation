@@ -18,6 +18,7 @@ async function writeS3BucketData(clientId, imageId, data) {
         // Our key will be a mix of the ownerID and fragment id, written as a path
         Key: `${clientId}/${imageId}`,
         Body: data,
+        ContentType: 'image/png',
     }
 
     // Create a PUT Object command to send to S3
@@ -110,6 +111,8 @@ async function readSpecificS3BucketData(clientId, imageIds) {
             })
         )
 
+        console.log('src', imageBuffers)
+
         return imageBuffers.map(({ src, key }) => {
             console.log('src', src.Body)
             return {
@@ -120,6 +123,19 @@ async function readSpecificS3BucketData(clientId, imageIds) {
     } catch (err) {
         console.log('err', err)
         throw new Error('unable to read s3 data')
+    }
+}
+
+function readS3URLBucketData(clientId, imageId) {
+    try {
+        const imageS3Url = {
+            src: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${clientId}/${imageId}`,
+            key: imageId,
+        }
+        return imageS3Url
+    } catch (err) {
+        console.log('err', err)
+        throw new Error('unable to read s3 URL data')
     }
 }
 
@@ -199,3 +215,4 @@ module.exports.deleteS3BucketData = deleteS3BucketData
 module.exports.readDynamoDB = readDynamoDB
 module.exports.writeDynamoDB = writeDynamoDB
 module.exports.readSpecificS3BucketData = readSpecificS3BucketData
+module.exports.readS3URLBucketData = readS3URLBucketData
