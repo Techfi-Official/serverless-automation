@@ -69,6 +69,10 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
+
+            - name: Install dependencies
+              run: npm install
+
             - name: Package Application
               run: zip -r archive.zip ./* -x "archive.zip" "./zip_files.sh" "./README.md" "./.*" "public/*" "model_AI/*"
             - name: Configure AWS credentials
