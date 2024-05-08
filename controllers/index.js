@@ -19,6 +19,6 @@ router.post(['/send-email'], authUserApiKey, sendEmail)
 
 router.post(['/post-webhook'], postWebhook)
 
-// router.post(['/post-image-ai'], require('./api').postImageAI)
+router.post(['/post-image-ai'], require('./api').postImageAI)
 
 module.exports = router
