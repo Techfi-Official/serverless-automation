@@ -96,15 +96,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     try {
                         console.log(
                             'img',
-                            document.getElementById('edit_tweet').value
+                            document.getElementById('dynamicImg').src
                         )
-                        const githubUrl = `https://cloud.activepieces.com/api/v1/webhooks/Ts3WLRwxW6kMVAws5bANXd`
+                        const WebhookUrl = `https://cloud.activepieces.com/api/v1/webhooks/Ts3WLRwxW6kMVAws5bANX`
 
-                        const response = await fetch(githubUrl, {
+                        const response = await fetch(WebhookUrl, {
+                            method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 isPublished: true,
-                                instruction: '',
+                                instruction:
+                                    document.getElementById('edit_tweet').value,
                                 image: document.getElementById('dynamicImg')
                                     .src,
                             }),
