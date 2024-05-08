@@ -77,9 +77,7 @@ app.use(
 // })
 
 app.get('/test', (req, res) => {
-    return res
-        .status(200)
-        .send('WHY ARE THE MESSAGES FROM THE MESSAGES NOT WORKING')
+    res.status(200).send('WHY ARE THE MESSAGES FROM THE MESSAGES NOT WORKING')
 })
 
 app.use('/', require('./controllers'))
