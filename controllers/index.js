@@ -13,7 +13,7 @@ router.get(['/'], getDataRenderHTML)
 
 router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
 
-router.get(['/test'], authUserApiKey, (req, res) => {
+router.get(['/test'], (req, res) => {
     res.status(200).send('OK')
 })
 
