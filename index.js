@@ -3,9 +3,9 @@ const express = require('express')
 const app = express()
 const path = require('path')
 const cors = require('cors')
-// const helmet = require('helmet')
+const helmet = require('helmet')
 const axios = require('axios')
-// const helmetConnect = require('./utils/connectionHelmet')
+const helmetConnect = require('./utils/connectionHelmet')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
@@ -19,14 +19,14 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(express.json())
 
-// app.use(
-//     helmet.contentSecurityPolicy({
-//         directives: {
-//             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-//             ...helmetConnect,
-//         },
-//     })
-// )
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            ...helmetConnect,
+        },
+    })
+)
 // Use CORS middleware so we can make requests across origins
 app.use(
     cors({
