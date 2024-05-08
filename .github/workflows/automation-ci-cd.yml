@@ -83,7 +83,7 @@ jobs:
                   aws-region: us-east-1 # Specify your AWS region
             - name: Update Lambda function code
               run: |
-                  aws lambda update-function-code --function-name automation-media --zip-file ./archive.zip
+                  aws lambda update-function-code --function-name automation-media --zip-file fileb://archive.zip
             - name: Clean up
               run: rm -rf archive.zip
             - name: Deployed successfully
