@@ -77,7 +77,9 @@ app.use(
 // })
 
 app.get('/test', (req, res) => {
-    res.status(200).send('WHY ARE THE MESSAGES FROM THE MESSAGES NOT WORKING')
+    return res
+        .status(200)
+        .send('WHY ARE THE MESSAGES FROM THE MESSAGES NOT WORKING')
 })
 
 app.use('/', require('./controllers'))
@@ -135,10 +137,10 @@ else
                     context.fail(error)
                 } else {
                     // Adjust the response to set Content-Type to text/html
-                    response.headers['Content-Type'] = 'text/html'
+                    // response.headers['Content-Type'] = 'text/html'
 
                     // Ensure no isBase64Encoded flag unless your content is actually base64 encoded
-                    response.isBase64Encoded = false
+                    // response.isBase64Encoded = false
 
                     context.succeed(response)
                 }
