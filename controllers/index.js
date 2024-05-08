@@ -13,6 +13,10 @@ router.get(['/'], getDataRenderHTML)
 
 router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
 
+router.get(['/test'], authUserApiKey, (req, res) => {
+    res.status(200).send('OK')
+})
+
 router.post(['/post-data-image-ai'], authUserApiKey, postDataAndImageAI)
 
 router.post(['/send-email'], authUserApiKey, sendEmail)
