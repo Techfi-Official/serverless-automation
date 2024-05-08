@@ -108,7 +108,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
                     imageURLs.push(instanceData.getS3URLData())
                 }
                 console.log('Image generated : ', imageURLs)
-                return res.status(201).json(JSON.stringify({ imageURLs }))
+                return res.status(201).json({ imageURLs })
             } catch (error) {
                 console.log(`error`, error)
                 res.status(500).end(
