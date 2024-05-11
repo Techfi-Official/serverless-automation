@@ -190,16 +190,19 @@ module.exports.wakeAIModel = async (req, res) => {
 
 module.exports.sendEmail = async (req, res) => {
     const {
-        imageSrc,
+        imageSrc1,
+        imageSrc2,
+        imageSrc3,
         approveLink,
         disapproveLink,
         editLink,
         postBody,
         email,
         platform,
+        companyName,
     } = req.body
     // Basic validation
-    if (!approveLink || !disapproveLink || !email || !postBody || !platform) {
+    if (!approveLink || !disapproveLink || !email || !postBody || !platform || !companyName) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
 
@@ -225,11 +228,14 @@ module.exports.sendEmail = async (req, res) => {
             templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
             dynamicTemplateData: {
                 subject: 'Check Your New Generated Tweet!',
-                imageSrc: imageSrc ? imageSrc : null,
+                imageSrc1,
+                imageSrc2,
+                imageSrc3,
                 approveLink,
                 disapproveLink,
                 editLink,
                 postBody,
+                companyName,
             },
         }
 
