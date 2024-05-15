@@ -23,6 +23,59 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
+    // Upload button functionality
+    const uploadButton = document.getElementById('uploadButton')
+    const fileInput = document.getElementById('uploadInput')
+    uploadButton.addEventListener('click', function () {
+        fileInput.click()
+    })
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0]
+        console.log(file, 'ozan')
+        if (file) {
+            console.log('File is present:', file);
+            const reader = new FileReader();
+            console.log(reader, 'ozan3');
+            reader.onload = function (e) {
+                console.log('FileReader onload triggered', e, 'ozan2');
+                const img = document.querySelector('#uploadedImage .image-container img');
+                if (img) {
+                    img.src = e.target.result;
+                    img.alt = 'selected_image';
+                    img.id = 'dynamicImg';
+                    img.style.borderRadius = '20px';
+                    img.style.width = '100%';
+                    document.getElementById('uploadedImage').style.display = 'block';
+                    // select the image
+                    const imageContainer = document.querySelectorAll('.image-container');
+                    imageContainer.forEach((container) => {
+                        container.classList.remove('image-selected');
+                    });
+                    // remove the image
+                    const imgToRemove = document.getElementById('dynamicImg');
+                    if (imgToRemove) {
+                        document.getElementById('reviewImg').removeChild(imgToRemove);
+                    }
+                    // append the image
+                    document.getElementById('reviewImg').appendChild(img);
+                    
+
+                } else {
+                    console.error('Image element not found');
+                }
+            };
+            reader.onerror = function (e) {
+                console.error('FileReader error', e);
+            };
+            reader.readAsDataURL(file); // Make sure to call this method to trigger the read process
+            console.log('Called readAsDataURL on FileReader');
+        }
+    })
+ 
+        
+
+
     const textInputIMG = document.getElementById('textInputIMG')
     const textInputPOST = document.getElementById('textInputPOST')
     const textInputIMGValue = document.getElementById('textInputIMGValue')
