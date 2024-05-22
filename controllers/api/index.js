@@ -78,15 +78,11 @@ module.exports.postDataAndImageAI = async (req, res) => {
         },
     }
     await axios
-        .post(
-            `${process.env.SERVER_AI_MODEL}/development/predict`,
-            JSON.stringify(input),
-            {
-                headers: {
-                    Authorization: `Api-Key ${process.env.API_KEY}`,
-                },
-            }
-        )
+        .post(`${process.env.SERVER_AI_MODEL}/development/predict`, input, {
+            headers: {
+                Authorization: `Api-Key ${process.env.API_KEY}`,
+            },
+        })
         .then(async (response) => {
             const image = await response.data
             let imageURLs = []
@@ -202,7 +198,14 @@ module.exports.sendEmail = async (req, res) => {
         companyName,
     } = req.body
     // Basic validation
-    if (!approveLink || !disapproveLink || !email || !postBody || !platform || !companyName) {
+    if (
+        !approveLink ||
+        !disapproveLink ||
+        !email ||
+        !postBody ||
+        !platform ||
+        !companyName
+    ) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
 
