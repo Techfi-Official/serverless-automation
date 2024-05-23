@@ -81,6 +81,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
         .post(`${process.env.SERVER_AI_MODEL}/development/predict`, input, {
             headers: {
                 Authorization: `Api-Key ${process.env.API_KEY}`,
+                'Content-Type': 'application/json',
             },
         })
         .then(async (response) => {
