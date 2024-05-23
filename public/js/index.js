@@ -1,5 +1,37 @@
 /* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', function () {
+    const regeneratePost = document.getElementById('regenerate_post')
+    const textAreas = document.querySelectorAll('.textarea-control')
+    const checkboxes = document.querySelectorAll('.checkbox-control')
+
+    // Initially disable the regenerate post button
+    regeneratePost.ariaDisabled = 'true'
+    regeneratePost.disabled = true
+
+    // Helper function to determine if the button should be enabled
+    function updateButtonState() {
+        const isAnyChecked = Array.from(checkboxes).some(
+            (checkbox) => checkbox.checked
+        )
+        const isAnyFull = Array.from(textAreas).some(
+            (textArea) => textArea.value.trim() !== ''
+        )
+        const isEnabled = isAnyChecked && isAnyFull
+
+        regeneratePost.disabled = !isEnabled
+        regeneratePost.ariaDisabled = !isEnabled.toString()
+    }
+
+    // Add change listener to each checkbox
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', updateButtonState)
+    })
+
+    // Add input listener to each textarea
+    textAreas.forEach((textArea) => {
+        textArea.addEventListener('input', updateButtonState)
+    })
+
     const imageContainer = document.querySelectorAll('.image-container')
 
     imageContainer.forEach((container) => {
@@ -125,88 +157,106 @@ document.addEventListener('DOMContentLoaded', function () {
 
     validateForm(textInputIMG, textInputIMGValue, 'textInputIMGErr')
     validateForm(textInputPOST, textInputPOSTValue, 'textInputPOSTErr')
-    document
-        .getElementById('publishPost')
-        .addEventListener('click', function () {
-            Swal.fire({
-                confirmButtonColor: '#0d6efd',
-                cancelButtonColor: '#d33',
-                title: 'Publish the post',
-                imageUrl: document.getElementById('dynamicImg').src,
-                imageAlt: 'post image',
-                text: 'Are you sure you want to publish this post to twitter?',
-                icon: 'warning',
-                confirmButtonText: 'Publish',
-                showCancelButton: true,
-                reverseButtons: true,
-                showLoaderOnConfirm: true,
 
-                imageWidth:
-                    document.getElementById('dynamicImg').clientWidth - 200,
-                imageHeight:
-                    document.getElementById('dynamicImg').clientHeight - 200,
-                preConfirm: async () => {
-                    try {
-                        console.log(
-                            'img',
-                            document.getElementById('dynamicImg').src
-                        )
-                        const WebhookUrl = `https://cloud.activepieces.com/api/v1/webhooks/Ts3WLRwxW6kMVAws5bANX`
+    function alertFire(params) {
+        Swal.fire({
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#d33',
+            title: params.title,
+            imageUrl: params?.imgSrc ?? undefined,
+            imageAlt: 'post image',
+            text: params.text,
+            icon: 'warning',
+            confirmButtonText: 'Publish',
+            showCancelButton: true,
+            reverseButtons: true,
+            showLoaderOnConfirm: true,
+            width: params?.width ?? '32em',
+            imageWidth:
+                document.getElementById('dynamicImg')?.clientWidth - 200 ??
+                undefined,
+            imageHeight:
+                document.getElementById('dynamicImg')?.clientHeight - 200 ??
+                undefined,
+            preConfirm: async () => {
+                try {
+                    const WebhookUrl = `https://cloud.activepieces.com/api/v1/webhooks/Ts3WLRwxW6kMVAws5bANX`
 
-                        const response = await fetch(WebhookUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                isPublished: true,
-                                instruction:
-                                    document.getElementById('edit_tweet').value,
-                                image: document.getElementById('dynamicImg')
-                                    .src,
-                            }),
-                        })
-                        if (!response.ok) {
-                            return Swal.showValidationMessage(
-                                `${JSON.stringify(await response.json())}`
-                            )
-                        }
-                        return await response.json()
-                    } catch (error) {
-                        Swal.showValidationMessage(`Request failed: ${error}`)
-                    }
-                },
-                allowOutsideClick: () => !Swal.isLoading(),
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log(result)
-                    let timerInterval = null
-                    let percent = 0
-                    Swal.fire({
-                        title: `Posting content to twitter`,
-                        html: `Loading <span id="loading"></span>&#37;`,
-                        text: `${result.value}`,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            const timer = document.getElementById('loading')
-                            Swal.showLoading()
-                            timerInterval = setInterval(() => {
-                                percent += 5
-                                timer.textContent = percent
-                            }, 150)
-                        },
-                        willClose: () => {
-                            clearInterval(timerInterval)
-                        },
-                        allowOutsideClick: () => !Swal.isLoading(),
-                    }).then(() => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Post has been saved to twitter',
-                            showConfirmButton: false,
-                            timer: 1500,
-                        })
+                    const response = await fetch(WebhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(params?.data),
                     })
+                    if (!response.ok) {
+                        return Swal.showValidationMessage(
+                            `${JSON.stringify(await response.json())}`
+                        )
+                    }
+                    return await response.json()
+                } catch (error) {
+                    Swal.showValidationMessage(`Request failed: ${error}`)
                 }
-            })
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(result)
+                let timerInterval = null
+                let percent = 0
+                Swal.fire({
+                    title: `Posting content to ${params?.subTitle}`,
+                    html: `Loading <span id="loading"></span>&#37;`,
+                    text: `${result.value}`,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        const timer = document.getElementById('loading')
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => {
+                            percent += 5
+                            timer.textContent = percent
+                        }, 150)
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval)
+                    },
+                    allowOutsideClick: () => !Swal.isLoading(),
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Post has been saved to twitter',
+                        showConfirmButton: false,
+                        timer: 1500,
+                    })
+                })
+            }
         })
+    }
+
+    document.getElementById('publishPost').addEventListener('click', () =>
+        alertFire({
+            title: 'Publish the post',
+            imgSrc: document.getElementById('dynamicImg')?.src,
+            text: 'Are you sure you want to publish this post to twitter?',
+            subTitle: 'twitter',
+            data: {
+                isPublished: true,
+                instruction: document.getElementById('edit_tweet').value,
+                image: document.getElementById('dynamicImg').src,
+            },
+        })
+    )
+    document.getElementById('regenerate_post').addEventListener('click', () =>
+        alertFire({
+            title: 'Publish the post with a new prompt',
+            width: '38em',
+            text: 'Are you sure you want to generate a new post?',
+            subTitle: 'Email',
+            data: {
+                isPublished: false,
+                instruction: document.getElementById('flexCheckDefault').value,
+                imgSrc: document.getElementById('regenerate_post').value,
+            },
+        })
+    )
 })

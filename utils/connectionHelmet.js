@@ -1,7 +1,6 @@
 module.exports = {
     'connect-src': [
         "'self'",
-        'https://reqres.in/api/users?page=2',
         'https://a2pejekyml.execute-api.us-east-1.amazonaws.com/PROD/post-data-image-ai',
         'https://cloud.activepieces.com',
     ],

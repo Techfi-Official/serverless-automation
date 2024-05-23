@@ -75,7 +75,7 @@
             </div>
             <br />
             <div class="mb-2">
-                <input class="form-check-input" type="checkbox" id="flexCheckDefault" data-bs-toggle='collapse' data-bs-target="#collapseImage" aria-expanded="false" aria-controls="collapseImage">
+                <input class="form-check-input checkbox-control" type="checkbox" id="flexCheckDefault" data-bs-toggle='collapse' data-bs-target="#collapseImage" aria-expanded="false" aria-controls="collapseImage">
                 <label class="form-check-label align-middle" for="flexCheckDefault" style="margin-left: 10px;">Regenerate image with a new prompt</label>
             </div>
              <div class="collapse" id="collapseImage">
@@ -83,7 +83,7 @@
                     
                         <textarea
                             style="width: 100%;"
-                            class="form-control"
+                            class="form-control textarea-control"
                             name="textInputIMG"
                             rows="3"
                             min="0" 
@@ -107,10 +107,12 @@
                     <label class="mb-4" for="edit_tweet">Edit text for your post</label>
                     <div class="card">
                         <textarea
+                            disabled
                             rows="5"
                             name="edit_tweet"
                             class="form-control"
                             id="edit_tweet"
+                            aria-disabled="true"
                         /><%= tweet %></textarea>
                     </div>
                 </div>
@@ -118,14 +120,14 @@
             </form>
             <br />
             <div class="mb-2">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" data-bs-toggle="collapse" data-bs-target="#collapsePost" aria-expanded="false" aria-controls="collapsePost">
+                <input class="form-check-input checkbox-control" type="checkbox" value=""  id="flexCheckDefault" data-bs-toggle="collapse" data-bs-target="#collapsePost" aria-expanded="false" aria-controls="collapsePost">
                 <label class="form-check-label align-middle" for="flexCheckDefault" style="margin-left: 10px;">Regenerate body with a new prompt</label>
             </div>
             <div class="collapse" id="collapsePost">
                 <div class="d-flex flex-column">
                     <textarea
                         style="width: 100%;"
-                        class="form-control"
+                        class="form-control textarea-control"
                         name="textInputPOST"
                         rows="3"
                         id="textInputPOST"
@@ -165,7 +167,7 @@
         </section>
         <footer class="custom-grey-bg p-3 position-sticky sticky-bottom">
                 <div class="p-1 d-flex justify-content-end gap-4">
-                    <button type="submit" class="btn btn-outline-primary">
+                    <button type="submit" class="btn btn-outline-primary" id="regenerate_post">
                             Regenerate Post
                     </button>
                     <button type="button" id="publishPost" class="btn btn-primary">
