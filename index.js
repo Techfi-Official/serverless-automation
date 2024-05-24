@@ -12,8 +12,6 @@ const PORT = process.env.PORT || 3000
 // Set the view engine to EJS for templating
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
-// Parse JSON bodies (as sent by API clients)
-app.use(express.urlencoded({ extended: true }))
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')))
 
