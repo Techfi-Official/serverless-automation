@@ -1,15 +1,20 @@
 /* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', function () {
+    // Get references to HTML elements
     const regeneratePost = document.getElementById('regenerate_post')
     const textAreas = document.querySelectorAll('.textarea-control')
     const checkboxes = document.querySelectorAll('.checkbox-control')
+    const imageContainers = document.querySelectorAll('.image-container')
+    const uploadButton = document.getElementById('uploadButton')
+    const removeButton = document.getElementById('removeButton')
+    const fileInput = document.getElementById('uploadInputImage')
 
     // Initially disable the regenerate post button
     regeneratePost.ariaDisabled = 'true'
     regeneratePost.disabled = true
 
     // Helper function to determine if the button should be enabled
-    function updateButtonState() {
+    const updateButtonState = () => {
         const isAnyChecked = Array.from(checkboxes).some(
             (checkbox) => checkbox.checked
         )
@@ -23,29 +28,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Add change listener to each checkbox
-    checkboxes.forEach((checkbox) => {
+    checkboxes.forEach((checkbox) =>
         checkbox.addEventListener('change', updateButtonState)
-    })
+    )
 
     // Add input listener to each textarea
-    textAreas.forEach((textArea) => {
+    textAreas.forEach((textArea) =>
         textArea.addEventListener('input', updateButtonState)
-    })
+    )
 
-    const imageContainer = document.querySelectorAll('.image-container')
-
-    imageContainer.forEach((container) => {
+    // Handle image selection (checked-mark)
+    imageContainers.forEach((container) => {
         container.addEventListener('click', function () {
-            imageContainer.forEach((img) =>
+            imageContainers.forEach((img) =>
                 img.classList.remove('image-selected')
             )
-            this.classList.toggle('image-selected')
+            this.classList.add('image-selected')
             const selectedImageUrl = this.querySelector('img').src
             const img = document.createElement('img')
             const imgToRemove = document.getElementById('dynamicImg')
+
             if (imgToRemove) {
-                document.getElementById('reviewImg').removeChild(imgToRemove)
+                document.getElementById('reviewImg')?.removeChild(imgToRemove)
             }
+
             img.src = selectedImageUrl
             img.alt = 'selected_image'
             img.id = 'dynamicImg'
@@ -56,79 +62,125 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     // Upload button functionality
-    const uploadButton = document.getElementById('uploadButton')
-    const fileInput = document.getElementById('uploadInput')
     uploadButton.addEventListener('click', function () {
-        fileInput.click()
-    })
+        const file = fileInput.files[0]
+        const dom = document
+            .getElementById('uploadedImage')
+            .querySelector('.image-container')
+        imageContainers.forEach((container) =>
+            container.classList.remove('image-selected')
+        )
 
-    fileInput.addEventListener('change', function () {
-        const file = this.files[0]
-        console.log(file, 'ozan')
+        if (dom) {
+            dom.classList.toggle('image-selected')
+        }
+
         if (file) {
-            console.log('File is present:', file);
-            const reader = new FileReader();
-            console.log(reader, 'ozan3');
-            reader.onload = function (e) {
-                console.log('FileReader onload triggered', e, 'ozan2');
-                const img = document.querySelector('#uploadedImage .image-container img');
-                if (img) {
-                    img.src = e.target.result;
-                    img.alt = 'selected_image';
-                    img.id = 'dynamicImg';
-                    img.style.borderRadius = '20px';
-                    img.style.width = '100%';
-                    document.getElementById('uploadedImage').style.display = 'block';
-                    // select the image
-                    const imageContainer = document.querySelectorAll('.image-container');
-                    imageContainer.forEach((container) => {
-                        container.classList.remove('image-selected');
-                    });
-                    // remove the image
-                    const imgToRemove = document.getElementById('dynamicImg');
-                    if (imgToRemove) {
-                        document.getElementById('reviewImg').removeChild(imgToRemove);
-                    }
-                    // append the image
-                    document.getElementById('reviewImg').appendChild(img);
-                    
+            console.log('File is present:', file)
+            const reader = new FileReader()
+            const imgParent = document.querySelector(
+                '#uploadedImage .image-container img'
+            )
 
+            reader.onload = function (e) {
+                console.log('FileReader onload triggered', e, 'ozan2')
+
+                if (imgParent) {
+                    const imgToRemove = document.getElementById('dynamicImg')
+
+                    if (imgToRemove) {
+                        console.log('Image removed 2', imgToRemove)
+                        document
+                            .getElementById('reviewImg')
+                            ?.removeChild(imgToRemove)
+                        imgToRemove.removeAttribute('id')
+                    }
+
+                    const img = document.createElement('img')
+                    img.src = e.target.result
+                    img.alt = 'selected_image'
+                    img.id = 'dynamicImg'
+                    img.style.borderRadius = '20px'
+                    img.style.width = '100%'
+                    document.getElementById('uploadedImage').style.display =
+                        'block'
+                    imgParent.src = e.target.result
+                    document.getElementById('reviewImg').appendChild(img)
                 } else {
-                    console.error('Image element not found');
+                    console.error('Image element not found')
                 }
-            };
+            }
+
             reader.onerror = function (e) {
-                console.error('FileReader error', e);
-            };
-            reader.readAsDataURL(file); // Make sure to call this method to trigger the read process
-            console.log('Called readAsDataURL on FileReader');
+                console.error('FileReader error', e)
+            }
+
+            reader.readAsDataURL(file) // Trigger the read process
+            $('#imageModal').modal('hide')
+            console.log('Called readAsDataURL on FileReader')
         }
     })
- 
-        
 
+    // Event listeners for file input
+    fileInput.addEventListener('change', fileUploadImage)
+    fileInput.addEventListener('dragenter', (e) => e.preventDefault())
+    fileInput.addEventListener('dragover', (e) => e.preventDefault())
+    fileInput.addEventListener('drop', (e) => {
+        e.preventDefault()
+        const image = e.originalEvent.dataTransfer.files[0]
+        fileUploadImage(image)
+    })
 
+    function fileUploadImage() {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader()
+            reader.onload = function (e) {
+                $('.image-upload-wrap').hide()
+
+                $('.file-upload-image').attr('src', e.target.result)
+                $('.file-upload-content').show()
+
+                $('.image-title').text(event.target.files[0].name)
+            }
+
+            reader.readAsDataURL(this.files[0])
+        } else {
+            removeUpload()
+        }
+    }
+    removeButton.addEventListener('click', removeUpload)
+
+    // Function to remove uploaded image
+    function removeUpload() {
+        $('.file-upload-input').val('')
+        $('.file-upload-content').hide()
+        $('.image-upload-wrap').show()
+    }
+
+    // Get references to input fields and character count elements
     const textInputIMG = document.getElementById('textInputIMG')
     const textInputPOST = document.getElementById('textInputPOST')
     const textInputIMGValue = document.getElementById('textInputIMGValue')
     const textInputPOSTValue = document.getElementById('textInputPOSTValue')
     const maxLength = 200
-    function validateForm(dataForm, output, err) {
-        // --- Prevent the user from pasting more than the maxLength ---
-        dataForm.addEventListener('paste', function (event) {
+
+    // Validate form input length
+    const validateForm = (dataForm, output, err) => {
+        // Prevent pasting more than the maxLength
+        dataForm.addEventListener('paste', (event) => {
             const clipboardData = event.clipboardData || window.clipboardData
             const pastedText = clipboardData.getData('text/plain')
+
             if (dataForm.value.length + pastedText.length > 200) {
                 dataForm.classList.add('is-invalid')
                 document.getElementById(err).innerText =
                     'Cannot type text as it would exceed the 200 character limit!'
-
                 event.preventDefault()
             }
         })
 
-        // --- Prevent the user from typing more than the maxLength ---
-        dataForm.addEventListener('keydown', function (e) {
+        // Prevent typing more than the maxLength
+        dataForm.addEventListener('keydown', (e) => {
             const currentLength = dataForm.value.length
             const isControlKey = [
                 'Backspace',
@@ -138,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'ArrowUp',
                 'ArrowDown',
             ].includes(e.key)
+
             if (!isControlKey && currentLength >= maxLength) {
                 e.preventDefault()
                 dataForm.classList.add('is-invalid')
@@ -146,10 +199,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
 
-        // --- Calculate the length of the input field Characters ---
-        dataForm.addEventListener('input', function (e) {
-            output.innerText =
-                e.target.value.length + `/${maxLength} characters`
+        // Calculate the length of the input field
+        dataForm.addEventListener('input', (e) => {
+            output.innerText = `${e.target.value.length}/${maxLength} characters`
             document.getElementById(err).innerText = null
             dataForm.classList.remove('is-invalid')
         })

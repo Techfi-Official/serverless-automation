@@ -1,0 +1,54 @@
+<div
+    class="modal fade"
+    id="imageModal"
+    tabindex="-1"
+    aria-labelledby="imageModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Upload Image</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <div class="image-upload-wrap">
+                    <input
+                        class="file-upload-input"
+                        id="uploadInputImage"
+                        type="file"
+                        accept="image/*"
+                        draggable="true"
+                    />
+                    <div class="drag-text">
+                        <h3>Drag and drop a file or select add Image</h3>
+                    </div>
+                </div>
+
+                <div class="file-upload-content">
+                    <img class="file-upload-image" src="#" alt="your image" />
+                    <div class="image-title-wrap">
+                        <button
+                            type="button"
+                            id="removeButton"
+                            class="btn btn-primary remove-image"
+                        >
+                            Remove
+                            <span class="image-title"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="uploadButton" class="btn btn-primary" type="button">
+                    Upload
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
