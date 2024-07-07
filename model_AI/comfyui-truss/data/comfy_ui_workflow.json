@@ -19,7 +19,7 @@
     },
     "4": {
         "inputs": {
-            "ckpt_name": "Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors"
+            "ckpt_name": "sd3_medium_incl_clips_t5xxlfp16.safetensors"
         },
         "class_type": "CheckpointLoaderSimple",
         "_meta": {
