@@ -1,4 +1,5 @@
 build_commands:
+- cd ComfyUI && pip install --upgrade torch torchvision torchaudio xformers --force-reinstall --index-url https://download.pytorch.org/whl/cu118
 - cd ComfyUI/models/checkpoints && wget -O sd3_medium_incl_clips.safetensors https://fs3.fastupload.io/ee77a98690f0aafb/sd3_medium_incl_clips.safetensors?download_token=2c3896dc280743cccaeb43683a3deb2228d738955054cbbeabba1a87248339bf
 - cd ComfyUI/models/loras && wget -O MJ52.safetensors https://huggingface.co/marinalaurel/mj/resolve/main/MJ52.safetensors
 base_image:
@@ -7,12 +8,7 @@ base_image:
 description: Deploy a ComfyUI workflow as a Truss
 environment_variables: {}
 external_package_dirs: []
-model_metadata:
-    example_model_input:
-        workflow_values:
-            negative_prompt: blurry, text, low quality
-            positive_prompt: An igloo on a snowy day, 4k, hd
-            seed: 1000000
+model_metadata: {}
 model_name: ComfyUI Workflow
 model_cache:
     - repo_id: s3://comfyui-image/comfy-ui/models/
@@ -24,11 +20,10 @@ requirements:
     - websocket-client==1.6.4
     - accelerate==0.23.0
     - safetensors==0.4.3
+    - transformers>=4.25.1
     - opencv-python
 resources:
     accelerator: A10G
-    cpu: "16"
-    memory: 64Gi
     use_gpu: true
 secrets: {}
 system_packages:
