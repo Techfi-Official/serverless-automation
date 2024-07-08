@@ -19,7 +19,7 @@
     },
     "4": {
         "inputs": {
-            "ckpt_name": "sd3_medium_incl_clips_t5xxlfp16.safetensors"
+            "ckpt_name": "sd3_medium_incl_clips.safetensors"
         },
         "class_type": "CheckpointLoaderSimple",
         "_meta": {

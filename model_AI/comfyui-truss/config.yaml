@@ -20,11 +20,12 @@ python_version: py39
 requirements:
     - websocket-client==1.6.4
     - accelerate==0.23.0
+    - safetensors==0.4.3
     - opencv-python
 resources:
     accelerator: A10G
-    cpu: '3'
-    memory: 14Gi
+    cpu: "16"
+    memory: 64Gi
     use_gpu: true
 secrets: {}
 system_packages:
