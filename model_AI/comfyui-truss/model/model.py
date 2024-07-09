@@ -71,7 +71,7 @@ class Model:
         json_workflow = copy.deepcopy(self.json_workflow)
         json_workflow = fill_template(json_workflow, template_values)
         print(json_workflow)
-        outputs = None
+
         try:
             outputs = get_images(
                 self.ws, json_workflow, self.client_id, self.server_address

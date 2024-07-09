@@ -1,7 +1,7 @@
 build_commands:
 - cd ComfyUI && pip install --upgrade torch torchvision torchaudio xformers --force-reinstall --index-url https://download.pytorch.org/whl/cu118
-- cd ComfyUI/models/checkpoints && wget -O sd3_medium_incl_clips.safetensors https://fs3.fastupload.io/ee77a98690f0aafb/sd3_medium_incl_clips.safetensors?download_token=2c3896dc280743cccaeb43683a3deb2228d738955054cbbeabba1a87248339bf
-- cd ComfyUI/models/loras && wget -O MJ52.safetensors https://huggingface.co/marinalaurel/mj/resolve/main/MJ52.safetensors
+secrets:
+  hf_access_token: null
 base_image:
     image: bolabaseten/comfyui-truss-base:6a7bc35
     python_executable_path: /usr/bin/python3
@@ -11,10 +11,11 @@ external_package_dirs: []
 model_metadata: {}
 model_name: ComfyUI Workflow
 model_cache:
-    - repo_id: s3://comfyui-image/comfy-ui/models/
+    - repo_id: stabilityai/stable-diffusion-3-medium
       allow_patterns:
-          - '*.json'
-          - '*.safetensors'
+          - sd3_medium_incl_clips.safetensors
+          - clip_g.safetensors
+          - clip_l.safetensors
 python_version: py310
 requirements:
     - websocket-client==1.6.4
@@ -25,7 +26,6 @@ requirements:
 resources:
     accelerator: A10G
     use_gpu: true
-secrets: {}
 system_packages:
     - wget
     - ffmpeg
