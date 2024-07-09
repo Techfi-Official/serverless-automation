@@ -1,7 +1,3 @@
-build_commands:
-- cd ComfyUI && pip install --upgrade torch torchvision torchaudio xformers --force-reinstall --index-url https://download.pytorch.org/whl/cu118
-secrets:
-  hf_access_token: null
 base_image:
     image: bolabaseten/comfyui-truss-base:6a7bc35
     python_executable_path: /usr/bin/python3
@@ -10,18 +6,21 @@ environment_variables: {}
 external_package_dirs: []
 model_metadata: {}
 model_name: ComfyUI Workflow
+secrets:
+    hf_access_token: null
 model_cache:
     - repo_id: stabilityai/stable-diffusion-3-medium
       allow_patterns:
           - sd3_medium_incl_clips.safetensors
           - clip_g.safetensors
           - clip_l.safetensors
-python_version: py310
+python_version: py39
 requirements:
     - websocket-client==1.6.4
     - accelerate==0.23.0
     - safetensors==0.4.3
-    - transformers>=4.25.1
+    - torch==2.0.1
+    - transformers==4.30.2
     - opencv-python
 resources:
     accelerator: A10G
