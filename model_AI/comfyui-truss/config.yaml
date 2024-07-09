@@ -11,9 +11,7 @@ secrets:
 model_cache:
     - repo_id: stabilityai/stable-diffusion-3-medium
       allow_patterns:
-          - sd3_medium_incl_clips.safetensors
-          - clip_g.safetensors
-          - clip_l.safetensors
+          - sd3_medium_incl_clips_t5xxlfp8.safetensors
 python_version: py39
 requirements:
     - websocket-client==1.6.4
