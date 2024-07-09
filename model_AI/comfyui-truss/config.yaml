@@ -1,3 +1,6 @@
+build_commands:
+- cd ComfyUI && git pull origin master
+- cd ComfyUI && git checkout 0cd4a6a5e5101172a1496c337e67f15ad266fb98 && pip install -r requirements.txt
 base_image:
     image: bolabaseten/comfyui-truss-base:6a7bc35
     python_executable_path: /usr/bin/python3
@@ -24,6 +27,7 @@ resources:
     accelerator: A10G
     use_gpu: true
 system_packages:
+    - git
     - wget
     - ffmpeg
     - libgl1-mesa-glx

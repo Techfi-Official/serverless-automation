@@ -167,7 +167,7 @@ module.exports.postWebhook = async (req, res) => {
 
 module.exports.wakeAIModel = async (req, res) => {
     await axios
-        .post(`https://app.baseten.co/model_versions/31l4l1q/wake`, null, {
+        .post(`https://app.baseten.co/model_versions/wp2jppq/wake`, null, {
             method: 'POST',
             headers: {
                 Authorization: `Api-Key GGfBURzN.4tZiaT0L0EY3lGEpeJm27aR4xVFRxn0X`,
