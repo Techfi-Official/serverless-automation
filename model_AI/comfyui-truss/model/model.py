@@ -77,21 +77,22 @@ class Model:
                 self.ws, json_workflow, self.client_id, self.server_address
             )
 
+        
+
+            for file in tempfiles:
+                file.close()
+
+            result = []
+
+            for node_id in outputs:
+                for item in outputs[node_id]:
+                    file_name = item.get("filename")
+                    file_data = item.get("data")
+                    output = convert_outputs_to_base64(
+                        node_id=node_id, file_name=file_name, file_data=file_data
+                    )
+                    result.append(output)
+
+            return {"result": result}
         except Exception as e:
             print("Error occurred while running Comfy workflow: ", e)
-
-        for file in tempfiles:
-            file.close()
-
-        result = []
-
-        for node_id in outputs:
-            for item in outputs[node_id]:
-                file_name = item.get("filename")
-                file_data = item.get("data")
-                output = convert_outputs_to_base64(
-                    node_id=node_id, file_name=file_name, file_data=file_data
-                )
-                result.append(output)
-
-        return {"result": result}
