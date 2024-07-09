@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 import os
 import time
 import uuid
@@ -77,13 +78,11 @@ class Model:
                 self.ws, json_workflow, self.client_id, self.server_address
             )
 
-        
-
             for file in tempfiles:
                 file.close()
 
             result = []
-
+            logging.info("Outputs: {}".format(outputs))
             for node_id in outputs:
                 for item in outputs[node_id]:
                     file_name = item.get("filename")

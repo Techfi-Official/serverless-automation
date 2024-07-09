@@ -2,22 +2,11 @@
     "6": {
         "inputs": {
             "text": "{{positive_prompt}}",
-            "clip": ["274", 0]
+            "clip": ["252", 1]
         },
         "class_type": "CLIPTextEncode",
         "_meta": {
             "title": "CLIP Text Encode (Prompt)"
-        }
-    },
-    "11": {
-        "inputs": {
-            "clip_name1": "clip_g.safetensors",
-            "clip_name2": "clip_l.safetensors",
-            "clip_name3": "clip_l.safetensors"
-        },
-        "class_type": "TripleCLIPLoader",
-        "_meta": {
-            "title": "TripleCLIPLoader"
         }
     },
     "13": {
@@ -73,8 +62,8 @@
     },
     "71": {
         "inputs": {
-            "text": "{{negative_prompt}}",
-            "clip": ["11", 0]
+            "text": "{{negative_prompt}]",
+            "clip": ["252", 1]
         },
         "class_type": "CLIPTextEncode",
         "_meta": {
@@ -113,7 +102,7 @@
     },
     "252": {
         "inputs": {
-            "ckpt_name": "sd3_medium_incl_clips.safetensors"
+            "ckpt_name": "sd3_medium_incl_clips_t5xxlfp8.safetensors"
         },
         "class_type": "CheckpointLoaderSimple",
         "_meta": {
@@ -136,17 +125,6 @@
         "class_type": "KSampler",
         "_meta": {
             "title": "KSampler"
-        }
-    },
-    "274": {
-        "inputs": {
-            "ratio": 1,
-            "clip1": ["252", 1],
-            "clip2": ["11", 0]
-        },
-        "class_type": "CLIPMergeSimple",
-        "_meta": {
-            "title": "CLIPMergeSimple"
         }
     }
 }

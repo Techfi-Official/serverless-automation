@@ -1,14 +1,6 @@
 [
     {
-        "url": "https://huggingface.co/karouhifar/sd-3/resolve/main/sd3_medium_incl_clips.safetensors",
-        "path": "models/checkpoints/sd3_medium_incl_clips.safetensors"
-    },
-    {
-        "url": "https://huggingface.co/karouhifar/sd-3/resolve/main/clip_g.safetensors",
-        "path": "models/clip/clip_g.safetensors"
-    },
-    {
-        "url": "https://huggingface.co/karouhifar/sd-3/resolve/main/clip_l.safetensors",
-        "path": "models/clip/clip_l.safetensors"
+        "url": "https://huggingface.co/karouhifar/sd-3/resolve/main/sd3_medium_incl_clips_t5xxlfp8.safetensors",
+        "path": "models/checkpoints/sd3_medium_incl_clips_t5xxlfp8.safetensors"
     }
 ]
