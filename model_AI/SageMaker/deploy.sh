@@ -2,6 +2,11 @@
 
 set -e # Exit on error
 set -u # Exit on undefined variable
+AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-$(aws configure get region)}"
+echo "AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}"
+
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+echo "AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}"
 
 # Set global variables for deployment, to be run after prepare_env functions
 configure() {
@@ -16,7 +21,7 @@ configure() {
     S3_BUCKET="comfyui-sagemaker-${AWS_ACCOUNT_ID}-${AWS_DEFAULT_REGION}"
 
     # Filename of lambda package on S3 bucket used during CloudFormation deployment
-    LAMBDA_FILE="lambda-$(lambda_hash).zip"
+    LAMBDA_FILE="lambda-57adae.zip"
 
     # Identifier of SageMaker model and endpoint config
     MODEL_VERSION="sample"
@@ -46,7 +51,9 @@ configure() {
     LAMBDA_URL_AUTH_TYPE="AWS_IAM"
 }
 
-aws cloudformation deploy --template-file cloudformation/template.yml \
+configure
+
+aws cloudformation deploy --template-file config/template.yml \
     --stack-name "$APP_NAME" \
     --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
     --parameter-overrides \
