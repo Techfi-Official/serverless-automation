@@ -32,9 +32,6 @@ Parameters:
     Description: Instance type of SageMaker endpoint
     AllowedValues:
       - ml.g4dn.xlarge
-      - ml.g4dn.2xlarge
-      - ml.g5.xlarge
-      - ml.g5.2xlarge
     Default: ml.g4dn.xlarge
   SageMakerAutoScaling:
     Type: String
@@ -116,8 +113,8 @@ Resources:
             - Name: FunctionName
               Value: !Ref ComfyUIFunction
           Statistic: Average
-        ScaleInCooldown: 1800
-        ScaleOutCooldown: 1800
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
         DisableScaleIn: false
   ComfyUIScalableTarget:
     Type: "AWS::ApplicationAutoScaling::ScalableTarget"
