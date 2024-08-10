@@ -298,15 +298,19 @@ document.addEventListener('DOMContentLoaded', function () {
             },
         })
     )
+    // TODO: Fix this. There is no difference between the image regenerate text and the post regenerate text
+    // TODO: Need to have instructions for body called body_instruction and image called image_instruction
     document.getElementById('regenerate_post').addEventListener('click', () =>
         alertFire({
-            title: 'Publish the post with a new prompt',
+            title: 'Regenerate post with new prompt',
             width: '38em',
             text: 'Are you sure you want to generate a new post?',
             subTitle: 'Email',
             data: {
                 isPublished: false,
-                instruction: document.getElementById('flexCheckDefault').value,
+                body_instruction: document.getElementById('textInputPOST').value,
+                image_instruction: document.getElementById('textInputIMG').value,
+                // TODO: Fix this. regenerate_post points to the button, not the input
                 imgSrc: document.getElementById('regenerate_post').value,
             },
         })
