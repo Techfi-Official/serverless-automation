@@ -155,8 +155,8 @@ async function deleteS3BucketData(ownerId, id) {
 }
 
 async function readDynamoDB(clientId) {
+    console.log('Entering readDynamoDB function');
     // Configure our GET params, with the name of the table and key (partition key + sort key)
-
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
         IndexName: 'clientIdCreatedAtIndex',
@@ -169,17 +169,21 @@ async function readDynamoDB(clientId) {
         Limit: global.sharedData?.limit ?? 10,
     }
 
-    // Create a GET command to send to DynamoDBs
+    // Create a GET command to send to DynamoDB
     const command = new QueryCommand(params)
 
     try {
+        console.log('Sending command to DynamoDB');
         // Wait for the data to come back from AWS
-
         const data = await ddbDocClient.send(command)
+
         // We may or may not get back any data (e.g., no item found for the given key).
         // If we get back an item (fragment), we'll return it.  Otherwise we'll return `undefined`.
+        console.log('Returning Items:', data?.Items);
         return data?.Items
     } catch (err) {
+        console.error('Error in DynamoDB query:', err);
+        console.error('Error details:', JSON.stringify(err, null, 2));
         throw new Error('unable to read data from DynamoDB')
     }
 }

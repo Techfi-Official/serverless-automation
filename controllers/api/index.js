@@ -12,14 +12,21 @@ module.exports.getDataRenderHTML = async (req, res) => {
         if (req.query.id) {
             const s3 = new S3BucketAndDynamoDB(req.query.id)
             global.sharedData = { limit: 4, isSorted: false }
-            tableData = await s3.getDynamoDBdata()
-
+            try {
+                console.log('Attempting to get DynamoDB data...')
+                tableData = await s3.getDynamoDBdata()
+            } catch (error) {
+                console.error('Error in getDynamoDBdata:', error)
+                return res.status(500).send(`Error fetching data: ${error.message}`)
+            }
+            if (!tableData || tableData.length === 0) {
+                console.log('No data returned from getDynamoDBdata')
+                return res.status(404).send('No data found for the given ID')
+            }
             const s3Data = await s3.getSortedS3Data(
                 tableData.map((item) => item.imageId)
             )
-
-            console.log(`tableData fetched items`, tableData)
-            console.log(`Data fetched items`, s3Data)
+            console.log('Starting Promise.all for image processing');
             // Await the completion of all promises inside Promise.all
             outputBuffer = await Promise.all(
                 s3Data.map(async (image) => {
@@ -33,6 +40,7 @@ module.exports.getDataRenderHTML = async (req, res) => {
                     }
                 })
             )
+            console.log('All image processing completed. outputBuffer length:', outputBuffer.length);
         } else {
             res.status(400).send('Invalid Request, request id is missing')
             return
@@ -50,8 +58,8 @@ module.exports.getDataRenderHTML = async (req, res) => {
     } catch (err) {
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
-            tweet: tableData[0].instruction ?? 'N/A',
-            platform: tableData[0].platform,
+            tweet: 'N/A',
+            platform: 'twitter',
             images: [],
         })
     }
