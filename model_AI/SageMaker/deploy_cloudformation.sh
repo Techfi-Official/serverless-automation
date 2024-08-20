@@ -1,5 +1,7 @@
 #!/bin/bash
-
+###########################################################################
+### This Part is responsible of AWS deploying cloudformation Automation ###
+###########################################################################
 set -e # Exit on error
 set -u # Exit on undefined variable
 AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-$(aws configure get region)}"

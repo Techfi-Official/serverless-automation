@@ -1,0 +1,2 @@
+https://huggingface.co/stabilityai/stable-diffusion-3-medium/resolve/main/sd3_medium_incl_clips_t5xxlfp8.safetensors checkpoints
+https://huggingface.co/OedoSoldier/detail-tweaker-lora/resolve/main/add_detail.safetensors loras
