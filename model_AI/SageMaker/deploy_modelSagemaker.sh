@@ -68,5 +68,5 @@ else
     # tar is slower
     tar -czvf ${TARGET_FILE} -C ${TARGET_DIR} .
 fi
-# echo "Uploading ${S3_PATH}..."
-# aws s3 cp "${TARGET_FILE}" "${S3_PATH}"
+echo "Uploading ${S3_PATH}..."
+aws s3 cp "${TARGET_FILE}" "${S3_PATH}"
