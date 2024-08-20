@@ -26,6 +26,6 @@ jobs:
       run: |
         echo "Running local shell commands..."
         cd ./model_AI/SageMaker
-        sh deploy_modelSagemaker.sh
+        bash deploy_modelSagemaker.sh
         echo "starting to clearup the zip file..."
         rm -rf model-artifact/* && rm -rf model-artifact.tgz
