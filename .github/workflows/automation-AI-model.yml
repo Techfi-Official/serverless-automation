@@ -1,4 +1,4 @@
-name: Run Local Shell Command
+name: AI DEPLOYMENT MODELS
 
 on:
   push:
@@ -26,6 +26,6 @@ jobs:
       run: |
         echo "Running local shell commands..."
         cd ./model_AI/SageMaker
-        deploy_modelSagemaker.sh
+        sh deploy_modelSagemaker.sh
         echo "starting to clearup the zip file..."
         rm -rf model-artifact/* && rm -rf model-artifact.tgz
