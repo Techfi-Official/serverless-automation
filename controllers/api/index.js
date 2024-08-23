@@ -119,8 +119,8 @@ module.exports.postDataAndImageAI = async (req, res) => {
         .then(async (response) => {
             const image = response.data
             let imageURLs = []
-            console.log('Image generated : ', [image])
-            if (!!image.toLowerCase().includes('none'))
+
+            if (Boolean(image.toLowerCase().includes('none')))
                 res.status(500).end(
                         'Something went wrong, please contact to <b>Email Address</b>'
                 )
