@@ -120,7 +120,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
             const image = response.data
             let imageURLs = []
 
-            if (Boolean(image.toLowerCase().includes('none')))
+            if (image.toLowerCase().includes('none'))
                 res.status(500).end(
                         'Something went wrong, please contact to <b>Email Address</b>'
                 )
