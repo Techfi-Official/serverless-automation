@@ -1,6 +1,10 @@
 const axios = require('axios')
 const { nanoid } = require('nanoid')
 const sgMail = require('@sendgrid/mail')
+const crypto = require('crypto')
+const aws4  = require('aws4')
+const https = require('https')
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 const { S3BucketAndDynamoDB } = require('../../models')
@@ -70,50 +74,75 @@ module.exports.postDataAndImageAI = async (req, res) => {
 
     // Validate the request body
     if (
-        !data?.instruction ||
+        !data?.positive_instruction ||
         !data?.clientId ||
         !data?.platform ||
         !data?.topic
     ) {
         res.status(400).send(`Invalid Request`)
     }
-
-    const input = {
-        workflow_values: {
-            seed: Math.floor(Math.random() * 10000),
-            positive_prompt: data.instruction,
-            negative_prompt: 'blurry, text, low quality',
-        },
+    const requestBody = {
+        positive_prompt: data.positive_instruction,
+        negative_prompt:
+            data?.negative_instruction || 'misshape, wrong text, six fingers',
+        prompt_file: 'workflow_api.json',
+        seed: Math.floor(Math.random() * 10000),
     }
-    await axios
-        .post(`${process.env.SERVER_AI_MODEL}/development/predict`, input, {
+
+    const bodyHash = crypto
+        .createHash('sha256')
+        .update(JSON.stringify(requestBody))
+        .digest('hex')
+        const request = {
+            host: new URL(process.env.SERVER_AI_MODEL).host,
+            method: 'POST',
+            path: new URL(process.env.SERVER_AI_MODEL).pathname,
             headers: {
-                Authorization: `Api-Key ${process.env.API_KEY}`,
                 'Content-Type': 'application/json',
+                'X-Amz-Content-Sha256': bodyHash,
             },
-        })
+            body: JSON.stringify(requestBody),
+            service: 'lambda',
+        }
+        const signedRequest = aws4.sign(request, {
+            accessKeyId: process.env.AWS_ACCESSES_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESSES_KEY,
+            region: process.env.AWS_REGIONS,
+        })   
+    await axios({
+        method: signedRequest.method,
+        url: process.env.SERVER_AI_MODEL,
+        headers: signedRequest.headers,
+        data: signedRequest.body,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    })
         .then(async (response) => {
-            const image = await response.data
+            const image = response.data
             let imageURLs = []
-            console.log('Image generated : ', image)
+            console.log('Image generated : ', [image])
+            if (!!image.toLowerCase().includes('none'))
+                res.status(500).end(
+                        'Something went wrong, please contact to <b>Email Address</b>'
+                )
+                 
             try {
-                for (const imgData of image.result) {
+                for (const imgData of [image]) {
                     const instanceData = new S3BucketAndDynamoDB(
                         data.clientId,
                         nanoid(),
-                        data.instruction,
+                        data.positive_instruction,
                         data.platform,
                         data.topic
                     )
 
                     await instanceData.postS3Data(
-                        Buffer.from(imgData.data, 'base64')
+                        Buffer.from(imgData, 'base64')
                     )
 
                     imageURLs.push(instanceData.getS3URLData())
                 }
                 console.log('Image generated : ', imageURLs)
-                return res.status(201).json({ imageURLs })
+                res.status(201).json({ imageURLs })
             } catch (error) {
                 console.log(`error`, error)
                 res.status(500).end(
