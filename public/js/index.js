@@ -38,28 +38,36 @@ document.addEventListener('DOMContentLoaded', function () {
     )
 
     // Handle image selection (checked-mark)
+    function selectImage(container) {
+        imageContainers.forEach(img => img.classList.remove('image-selected'));
+        container.classList.add('image-selected');
+        
+        const selectedImageUrl = container.querySelector('img').src;
+        const reviewImg = document.getElementById('reviewImg');
+        let dynamicImg = document.getElementById('dynamicImg');
+
+        if (!dynamicImg) {
+            dynamicImg = document.createElement('img');
+            dynamicImg.id = 'dynamicImg';
+            dynamicImg.alt = 'selected_image';
+            dynamicImg.style.borderRadius = '20px';
+            dynamicImg.style.width = '100%';
+            reviewImg.appendChild(dynamicImg);
+        }
+
+        dynamicImg.src = selectedImageUrl;
+    }
+
     imageContainers.forEach((container) => {
-        container.addEventListener('click', function () {
-            imageContainers.forEach((img) =>
-                img.classList.remove('image-selected')
-            )
-            this.classList.add('image-selected')
-            const selectedImageUrl = this.querySelector('img').src
-            const img = document.createElement('img')
-            const imgToRemove = document.getElementById('dynamicImg')
+        container.addEventListener('click', function() {
+            selectImage(this);
+        });
+    });
 
-            if (imgToRemove) {
-                document.getElementById('reviewImg')?.removeChild(imgToRemove)
-            }
-
-            img.src = selectedImageUrl
-            img.alt = 'selected_image'
-            img.id = 'dynamicImg'
-            img.style.borderRadius = '20px'
-            img.style.width = '100%'
-            document.getElementById('reviewImg').appendChild(img)
-        })
-    })
+    // Select the first image by default
+    if (imageContainers.length > 0) {
+        selectImage(imageContainers[0]);
+    }
 
     // Upload button functionality
     uploadButton.addEventListener('click', function () {
@@ -285,19 +293,22 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
-    document.getElementById('publishPost').addEventListener('click', () =>
+    // Update the publish post event listener
+    const selectedImage = document.querySelector('.image-container.image-selected img');
+    document.getElementById('publishPost').addEventListener('click', () => {
         alertFire({
             title: 'Publish the post',
-            imgSrc: document.getElementById('dynamicImg')?.src,
+            imgSrc: selectedImage ? selectedImage.src : '',
             text: 'Are you sure you want to publish this post to twitter?',
             subTitle: 'twitter',
             data: {
                 isPublished: true,
                 instruction: document.getElementById('edit_tweet').value,
-                image: document.getElementById('dynamicImg').src,
+                image: selectedImage ? selectedImage.src : '',
             },
-        })
-    )
+        });
+    })
+
     // TODO: Fix this. There is no difference between the image regenerate text and the post regenerate text
     // TODO: Need to have instructions for body called body_instruction and image called image_instruction
     document.getElementById('regenerate_post').addEventListener('click', () =>
