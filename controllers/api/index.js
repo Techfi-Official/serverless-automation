@@ -11,7 +11,7 @@ const { S3BucketAndDynamoDB } = require('../../models')
 const imageConversion = require('../../utils')
 module.exports.getDataRenderHTML = async (req, res) => {
     let tableData = null
-    let outputBuffer = []
+    let imageUrls = []
     try {
         if (req.query.id) {
             const s3 = new S3BucketAndDynamoDB(req.query.id)
@@ -31,20 +31,9 @@ module.exports.getDataRenderHTML = async (req, res) => {
                 tableData.map((item) => item.imageId)
             )
             console.log('Starting Promise.all for image processing');
-            // Await the completion of all promises inside Promise.all
-            outputBuffer = await Promise.all(
-                s3Data.map(async (image) => {
-                    try {
-                        console.log('Processing image:', image)
-                        const dataImg = await image.metaData
-                        return await imageConversion(dataImg)
-                    } catch (error) {
-                        console.error('Error converting image:', error)
-                        return null // Or handle as appropriate
-                    }
-                })
-            )
-            console.log('All image processing completed. outputBuffer length:', outputBuffer.length);
+            // Collect last 3 image URLs
+            imageUrls = s3Data.slice(-3).map((image) => image.url)
+            console.log('All image processing completed. imageUrls length:', imageUrls.length);
         } else {
             res.status(400).send('Invalid Request, request id is missing')
             return
@@ -52,12 +41,12 @@ module.exports.getDataRenderHTML = async (req, res) => {
 
         res.type('text/html')
 
-        // Send the converted image buffer as a response
+        // Send the image URLs as a response
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
             tweet: tableData[0].instruction ?? 'N/A',
             platform: tableData[0].platform,
-            images: outputBuffer.map((buffer) => buffer.toString('base64')),
+            images: imageUrls,
         })
     } catch (err) {
         res.render('index', {
@@ -93,22 +82,22 @@ module.exports.postDataAndImageAI = async (req, res) => {
         .createHash('sha256')
         .update(JSON.stringify(requestBody))
         .digest('hex')
-        const request = {
-            host: new URL(process.env.SERVER_AI_MODEL).host,
-            method: 'POST',
-            path: new URL(process.env.SERVER_AI_MODEL).pathname,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Amz-Content-Sha256': bodyHash,
-            },
-            body: JSON.stringify(requestBody),
-            service: 'lambda',
-        }
-        const signedRequest = aws4.sign(request, {
-            accessKeyId: process.env.AWS_ACCESSES_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESSES_KEY,
-            region: process.env.AWS_REGIONS,
-        })   
+    const request = {
+        host: new URL(process.env.SERVER_AI_MODEL).host,
+        method: 'POST',
+        path: new URL(process.env.SERVER_AI_MODEL).pathname,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Amz-Content-Sha256': bodyHash,
+        },
+        body: JSON.stringify(requestBody),
+        service: 'lambda',
+    }
+    const signedRequest = aws4.sign(request, {
+        accessKeyId: process.env.AWS_ACCESSES_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESSES_KEY,
+        region: process.env.AWS_REGIONS,
+    })   
     await axios({
         method: signedRequest.method,
         url: process.env.SERVER_AI_MODEL,

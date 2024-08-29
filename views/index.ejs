@@ -55,12 +55,12 @@
                 </div>
             </div>
             <div class="row" id="image-gallery">
-                <%if (images.length > 0) { %>
+                <% if (images.length > 0) { %>
                 <% images.forEach(function(image, index) { %>
                    <div class="col-6 col-sm-4 col-lg-3 p-2 position-relative image-container"> 
                         <img
                             class="rounded img-fluid img-thumbnail d-inline-block enchanted-img"
-                            src="data:image/png;base64,<%= image %>"
+                            src="<%= image %>"
                             alt="sample"
                         />
                         <i class="bi bi-check-circle-fill tick-icon"></i>
