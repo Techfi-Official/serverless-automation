@@ -8,7 +8,7 @@ const https = require('https')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 const { S3BucketAndDynamoDB } = require('../../models')
-const imageConversion = require('../../utils')
+// const imageConversion = require('../../utils')
 module.exports.getDataRenderHTML = async (req, res) => {
     let tableData = null
     let imageUrls = []
