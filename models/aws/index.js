@@ -164,7 +164,7 @@ async function readDynamoDB(clientId) {
         ExpressionAttributeValues: {
             ':clientId': clientId,
         },
-        ProjectionExpression: 'imageId, platform, instruction, topic',
+        ProjectionExpression: 'imageId, platform, instruction, imageUrl',
         ScanIndexForward: global.sharedData?.isSorted ?? false,
         Limit: global.sharedData?.limit ?? 10,
     }
@@ -188,7 +188,7 @@ async function readDynamoDB(clientId) {
     }
 }
 
-async function writeDynamoDB(clientId, imageId, instruction, platform, topic) {
+async function writeDynamoDB(clientId, imageId, instruction, platform, imageUrl) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
@@ -196,8 +196,8 @@ async function writeDynamoDB(clientId, imageId, instruction, platform, topic) {
             clientId: clientId,
             imageId: imageId,
             platform: platform,
-            topic: topic,
             instruction: instruction,
+            imageUrl: imageUrl,
             createdAt: new Date().toISOString(), // ISO string format timestamp
             updatedAt: new Date().toISOString(),
         },

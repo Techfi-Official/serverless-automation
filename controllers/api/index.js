@@ -65,8 +65,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
     if (
         !data?.positive_instruction ||
         !data?.clientId ||
-        !data?.platform ||
-        !data?.topic
+        !data?.platform
     ) {
         res.status(400).send(`Invalid Request`)
     }
@@ -82,22 +81,22 @@ module.exports.postDataAndImageAI = async (req, res) => {
         .createHash('sha256')
         .update(JSON.stringify(requestBody))
         .digest('hex')
-    const request = {
-        host: new URL(process.env.SERVER_AI_MODEL).host,
-        method: 'POST',
-        path: new URL(process.env.SERVER_AI_MODEL).pathname,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Amz-Content-Sha256': bodyHash,
-        },
-        body: JSON.stringify(requestBody),
-        service: 'lambda',
-    }
-    const signedRequest = aws4.sign(request, {
-        accessKeyId: process.env.AWS_ACCESSES_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESSES_KEY,
-        region: process.env.AWS_REGIONS,
-    })   
+        const request = {
+            host: new URL(process.env.SERVER_AI_MODEL).host,
+            method: 'POST',
+            path: new URL(process.env.SERVER_AI_MODEL).pathname,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Amz-Content-Sha256': bodyHash,
+            },
+            body: JSON.stringify(requestBody),
+            service: 'lambda',
+        }
+        const signedRequest = aws4.sign(request, {
+            accessKeyId: process.env.AWS_ACCESSES_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESSES_KEY,
+            region: process.env.AWS_REGIONS,
+        })   
     await axios({
         method: signedRequest.method,
         url: process.env.SERVER_AI_MODEL,
@@ -120,8 +119,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
                         data.clientId,
                         nanoid(),
                         data.positive_instruction,
-                        data.platform,
-                        data.topic
+                        data.platform
                     )
 
                     await instanceData.postS3Data(

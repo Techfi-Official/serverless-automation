@@ -8,11 +8,11 @@ const {
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(clientId, imageId, instruction, platform, topic) {
+    constructor(clientId, imageId, instruction, platform, imageUrl) {
         this.imageId = imageId || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
-        this.topic = topic || ''
+        this.imageUrl = imageUrl || ''
         if (clientId != null) {
             this.clientId = clientId
         } else {
@@ -51,7 +51,7 @@ class S3BucketAndDynamoDB {
             this.imageId,
             this.instruction,
             this.platform,
-            this.topic
+            this.imageUrl
         )
     }
 }
