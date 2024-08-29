@@ -32,8 +32,9 @@ module.exports.getDataRenderHTML = async (req, res) => {
             )
             console.log('Starting Promise.all for image processing');
             // Collect last 3 image URLs
-            imageUrls = s3Data.slice(-3).map((image) => image.url)
+            imageUrls = s3Data.slice(-3).map((image) => image.imageUrl)
             console.log('All image processing completed. imageUrls length:', imageUrls.length);
+            console.log('imageUrls:', imageUrls);
         } else {
             res.status(400).send('Invalid Request, request id is missing')
             return
