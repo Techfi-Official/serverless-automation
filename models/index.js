@@ -1,5 +1,8 @@
 const {
     readALLS3BucketData,
+    readClientData,
+    readPostsData,
+    readPostCount,
     readDynamoDB,
     writeDynamoDB,
     writeS3BucketData,
@@ -8,21 +11,33 @@ const {
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(postID, imageId, instruction, platform, imageUrl) {
+    constructor(scheduleID, clientId, imageId, instruction, platform, imageUrl) {
         this.imageId = imageId || ''
+        this.clientId = clientId || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
         this.imageUrl = imageUrl || ''
-        if (postID != null) {
-            this.postID = postID
+        if (scheduleID != null) {
+            this.scheduleID = scheduleID
         } else {
             throw new Error('id is required')
         }
     }
-
+    // GET CLIENT DATA
+    async getClientData() {
+        return await readClientData(this.clientId)
+    }
+    // CHECK IF POST IS PUBLISHED
+    async getPosts() {
+        return await readPostsData(this.scheduleID)
+    }
     // ---- GET & POST S3BUCKET
     async getAllS3Data() {
         return await readALLS3BucketData(this.postID)
+    }
+    // GET POST COUNT
+    async getPostCount(platform) {
+        return await readPostCount(platform)
     }
 
     // ---- GET & POST S3BUCKET

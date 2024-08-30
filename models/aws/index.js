@@ -159,7 +159,7 @@ async function readDynamoDB(postID, clientId) {
     // Configure our GET params, with the name of the table and key (partition key + sort key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        IndexName: 'clientIdCreatedAtIndex', // Ensure this is the correct index name
+        IndexName: 'clientIdCreatedAtIndex',
         KeyConditionExpression: 'postID = :postID AND clientId = :clientId',
         ExpressionAttributeValues: {
             ':postID': postID,
@@ -188,7 +188,63 @@ async function readDynamoDB(postID, clientId) {
         throw new Error('unable to read data from DynamoDB')
     }
 }
+// Create readPostData
+async function readPostsData(scheduleID) {
+    // Configure our GET params, with the name of the table and key (partition key + sort key)
+    const params = {
+        TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+        Key: {
+            scheduleID: scheduleID,
+        },
+    }
 
+    // Create a GET command to send to DynamoDB
+    const command = new QueryCommand(params)
+
+    try {
+        return await ddbDocClient.send(command)
+    } catch (err) {
+        throw new Error(err)
+    }
+}
+// Create readClientData
+async function readClientData(clientId) {
+    // Configure our GET params, with the name of the table and key (partition key + sort key)
+    const params = {
+        TableName: process.env.AWS_DYNAMODB_CLIENTS_TABLE_NAME,
+        Key: {
+            clientId: clientId,
+        },
+    }
+
+    // Create a GET command to send to DynamoDB
+    const command = new QueryCommand(params)
+
+    try {
+        return await ddbDocClient.send(command)
+    } catch (err) {
+        throw new Error(err)
+    }
+}
+// Create readPostCount
+async function readPostCount(platform) {
+    // Configure our GET params, with the name of the table and key (partition key + sort key)
+    const params = {
+        TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+        Key: {
+            platform: platform,
+        },
+    }
+
+    // Create a GET command to send to DynamoDB
+    const command = new QueryCommand(params)
+
+    try {
+        return await ddbDocClient.send(command)
+    } catch (err) {
+        throw new Error(err)
+    }
+}
 async function writeDynamoDB(postID, imageId, instruction, platform, imageUrl) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
@@ -219,5 +275,8 @@ module.exports.readALLS3BucketData = readALLS3BucketData
 module.exports.deleteS3BucketData = deleteS3BucketData
 module.exports.readDynamoDB = readDynamoDB
 module.exports.writeDynamoDB = writeDynamoDB
+module.exports.readClientData = readClientData
+module.exports.readPostsData = readPostsData
+module.exports.readPostCount = readPostCount
 module.exports.readSpecificS3BucketData = readSpecificS3BucketData
 module.exports.readS3URLBucketData = readS3URLBucketData

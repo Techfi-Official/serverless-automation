@@ -284,19 +284,52 @@ module.exports.sendEmail = async (req, res) => {
     }
 }
 
-
 module.exports.checkScheduleIdValidity = async (req, res) => {
-    const { scheduleID } = req.body
+    const { scheduleID, clientId } = req.body
 
-    if (!scheduleID) {
+    if (!scheduleID || !clientId) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
-    // TODO: Get client platform limit from dynamoDB clients table
-    
-    // TODO: Check if any post is published with the scheduleID
-    // TODO: If yes, then return res.status(400).json({ message: 'Post already published' })
-    
-    // TODO: Check if number of posts are less than platform limit
-    // TODO: If yes, then return res.status(200).json({ message: 'Schedule ID is valid' })
-    // TODO: If no, then return res.status(400).json({ message: 'Platform limit reached' })
+
+    try {
+        // Get client platform limit from dynamoDB clients table
+        const clientData = await S3BucketAndDynamoDB.getClientData()
+        console.log('clientData', clientData)
+        const twitterLimit = clientData.twitterLimit
+        const facebookLimit = clientData.facebookLimit
+        const instagramLimit = clientData.instagramLimit
+        const linkedinLimit = clientData.linkedinLimit
+        console.log('twitterLimit', twitterLimit)
+        console.log('facebookLimit', facebookLimit)
+        console.log('instagramLimit', instagramLimit)
+        console.log('linkedinLimit', linkedinLimit)
+
+        // Check if any post is published with the scheduleID
+        const posts = await S3BucketAndDynamoDB.getPosts(scheduleID)
+        console.log('posts', posts)
+        if (posts.length > 0) {
+            for (const post of posts) {
+                if (post.isPublished) {
+                    return res.status(400).json({ message: 'Post already published' })
+                }
+            }
+        }
+        // Check if number of posts are less than platform limit
+        const platformLimits = {
+            twitter: twitterLimit,
+            facebook: facebookLimit,
+            instagram: instagramLimit,
+            linkedin: linkedinLimit,
+        }
+
+        for (const platform of platforms) {
+            const postCount = await S3BucketAndDynamoDB.getPostCount(platform)
+            if (postCount < platformLimits[platform]) {
+                return res.status(200).json({ message: 'Schedule ID is valid' })
+            }
+        }
+        return res.status(400).json({ message: 'Schedule ID is not valid' })
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message })
+    }
 }
