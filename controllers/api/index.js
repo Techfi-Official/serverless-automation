@@ -75,7 +75,6 @@ module.exports.postDataAndImageAI = async (req, res) => {
         negative_prompt:
             data?.negative_instruction || 'misshape, wrong text, six fingers',
         prompt_file: 'workflow_api.json',
-        seed: Math.floor(Math.random() * 10000),
     }
 
     const bodyHash = crypto
@@ -115,7 +114,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
                 )
                  
             try {
-                for (const imgData of [image]) {
+                for (const imgData of image) {
                     const instanceData = new S3BucketAndDynamoDB(
                         data.clientId,
                         nanoid(),
@@ -234,6 +233,8 @@ module.exports.sendEmail = async (req, res) => {
     ) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
+
+    // TODO: Before sending email populate the email in dyanmoDB
 
     // Define a mapping from platforms to their respective email template IDs
     const templateIdMap = {
