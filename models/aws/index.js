@@ -11,12 +11,12 @@ const { QueryCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
 
 // Writes a fragment's data to an S3 Object in a Bucket
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#upload-an-existing-object-to-an-amazon-s3-bucket
-async function writeS3BucketData(clientId, imageId, data) {
+async function writeS3BucketData(postID, imageId, data) {
     // Create the PUT API params from our details
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         // Our key will be a mix of the ownerID and fragment id, written as a path
-        Key: `${clientId}/${imageId}`,
+        Key: `${postID}/${imageId}`,
         Body: data,
         ContentType: 'image/png',
     }
@@ -53,13 +53,13 @@ const streamToBuffer = (stream) =>
 // https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#getting-a-file-from-an-amazon-s3-bucket
 // eslint-disable-next-line no-unused-vars
 // This function only returns all S3 buckets based on only ClientId
-async function readALLS3BucketData(clientId) {
+async function readALLS3BucketData(postID) {
     // Create the PUT API params from our details
 
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         // Our key will be a mix of the ownerID and fragment id, written as a path
-        Prefix: `${clientId}/`,
+        Prefix: `${postID}/`,
     }
 
     // Create a GET Object command to send to S3
@@ -96,7 +96,7 @@ async function readALLS3BucketData(clientId) {
     }
 }
 
-async function readSpecificS3BucketData(clientId, imageIds) {
+async function readSpecificS3BucketData(postID, imageIds) {
     try {
         // Convert the ReadableStream to a Buffer
         // Fetch all image buffers
@@ -104,7 +104,7 @@ async function readSpecificS3BucketData(clientId, imageIds) {
             imageIds.map(async (imageId) => {
                 const params = {
                     Bucket: process.env.AWS_S3_BUCKET_NAME,
-                    Key: `${clientId}/${imageId}`,
+                    Key: `${postID}/${imageId}`,
                 }
                 const command = new GetObjectCommand(params)
                 return { src: await s3Client.send(command), key: imageId }
@@ -126,10 +126,10 @@ async function readSpecificS3BucketData(clientId, imageIds) {
     }
 }
 
-function readS3URLBucketData(clientId, imageId) {
+function readS3URLBucketData(postID, imageId) {
     try {
         const imageS3Url = {
-            src: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${clientId}/${imageId}`,
+            src: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${postID}/${imageId}`,
             key: imageId,
         }
         return imageS3Url
@@ -154,14 +154,15 @@ async function deleteS3BucketData(ownerId, id) {
     }
 }
 
-async function readDynamoDB(clientId) {
+async function readDynamoDB(postID, clientId) {
     console.log('Entering readDynamoDB function');
     // Configure our GET params, with the name of the table and key (partition key + sort key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        IndexName: 'clientIdCreatedAtIndex',
-        KeyConditionExpression: 'clientId = :clientId',
+        IndexName: 'clientIdCreatedAtIndex', // Ensure this is the correct index name
+        KeyConditionExpression: 'postID = :postID AND clientId = :clientId',
         ExpressionAttributeValues: {
+            ':postID': postID,
             ':clientId': clientId,
         },
         ProjectionExpression: 'imageId, platform, instruction, imageUrl',
@@ -188,12 +189,12 @@ async function readDynamoDB(clientId) {
     }
 }
 
-async function writeDynamoDB(clientId, imageId, instruction, platform, imageUrl) {
+async function writeDynamoDB(postID, imageId, instruction, platform, imageUrl) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
         Item: {
-            clientId: clientId,
+            postID: postID,
             imageId: imageId,
             platform: platform,
             instruction: instruction,
