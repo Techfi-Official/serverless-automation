@@ -1,5 +1,8 @@
 const {
     readALLS3BucketData,
+    readClientData,
+    readPostsData,
+    readPostCount,
     readDynamoDB,
     writeDynamoDB,
     writeS3BucketData,
@@ -8,46 +11,58 @@ const {
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(clientId, imageId, instruction, platform, imageUrl) {
+    constructor(scheduleID, clientId, imageId, instruction, platform, imageUrl) {
         this.imageId = imageId || ''
+        this.clientId = clientId || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
         this.imageUrl = imageUrl || ''
-        if (clientId != null) {
-            this.clientId = clientId
+        if (scheduleID != null) {
+            this.scheduleID = scheduleID
         } else {
             throw new Error('id is required')
         }
     }
-
+    // GET CLIENT DATA
+    async getClientData() {
+        return await readClientData(this.clientId)
+    }
+    // CHECK IF POST IS PUBLISHED
+    async getPosts() {
+        return await readPostsData(this.scheduleID)
+    }
     // ---- GET & POST S3BUCKET
     async getAllS3Data() {
-        return await readALLS3BucketData(this.clientId)
+        return await readALLS3BucketData(this.postID)
+    }
+    // GET POST COUNT
+    async getPostCount(platform) {
+        return await readPostCount(platform)
     }
 
     // ---- GET & POST S3BUCKET
     async getSortedS3Data(imageId) {
-        return await readSpecificS3BucketData(this.clientId, imageId)
+        return await readSpecificS3BucketData(this.postID, imageId)
     }
 
     async postS3Data(data) {
         this.writeDynamoDB()
-        return await writeS3BucketData(this.clientId, this.imageId, data)
+        return await writeS3BucketData(this.postID, this.imageId, data)
     }
 
     getS3URLData() {
-        return readS3URLBucketData(this.clientId, this.imageId)
+        return readS3URLBucketData(this.postID, this.imageId)
     }
 
     // --------------------------------
 
     getDynamoDBdata() {
-        return readDynamoDB(this.clientId)
+        return readDynamoDB(this.postID)
     }
 
     writeDynamoDB() {
         return writeDynamoDB(
-            this.clientId,
+            this.postID,
             this.imageId,
             this.instruction,
             this.platform,

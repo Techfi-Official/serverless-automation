@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 undefined,
             preConfirm: async () => {
                 try {
-                    const WebhookUrl = `https://cloud.activepieces.com/api/v1/webhooks/Ts3WLRwxW6kMVAws5bANX`
+                    const WebhookUrl = process.env.API_URL
 
                     const response = await fetch(WebhookUrl, {
                         method: 'POST',

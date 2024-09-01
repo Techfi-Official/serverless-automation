@@ -27,9 +27,8 @@ module.exports.getDataRenderHTML = async (req, res) => {
                 console.log('No data returned from getDynamoDBdata')
                 return res.status(404).send('No data found for the given ID')
             }
-            const s3Data = await s3.getSortedS3Data(
-                tableData.map((item) => item.imageId)
-            )
+            const s3Data = await s3.getS3URLData()
+            console.log('s3Data:', s3Data);
             console.log('Starting Promise.all for image processing');
             // Collect last 3 image URLs
             imageUrls = s3Data.slice(-3).map((image) => image.imageUrl)
@@ -65,7 +64,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
     // Validate the request body
     if (
         !data?.positive_instruction ||
-        !data?.clientId ||
+        !data?.postID ||
         !data?.platform
     ) {
         res.status(400).send(`Invalid Request`)
@@ -116,7 +115,7 @@ module.exports.postDataAndImageAI = async (req, res) => {
             try {
                 for (const imgData of image) {
                     const instanceData = new S3BucketAndDynamoDB(
-                        data.clientId,
+                        data.postID,
                         nanoid(),
                         data.positive_instruction,
                         data.platform
@@ -148,22 +147,26 @@ module.exports.postWebhook = async (req, res) => {
     const data = req.body || null
 
     if (
-        !data?.clientId ||
+        !data?.postID ||
         !data?.mainText ||
         !data?.platform ||
         !data?.textInstruction ||
-        !data?.imgInstruction
+        !data?.imgInstruction ||
+        !data?.scheduleID ||
+        !data?.clientID
     ) {
         res.status(400).send('Invalid Request')
         return
     }
 
     const input = {
-        clientId: data?.clientId,
+        postID: data?.postID,
+        clientID: data?.clientID,
         mainText: data.mainText,
         platform: data.platform,
         textInstruction: data.textInstruction,
         imgInstruction: data.imgInstruction,
+        scheduleID: data.scheduleID,
     }
     console.log('Success 2:', process.env.WEBHOOK_SERVER)
     try {
@@ -279,5 +282,55 @@ module.exports.sendEmail = async (req, res) => {
             message: 'Failed to send email',
             error: error.message,
         })
+    }
+}
+
+module.exports.checkScheduleIdValidity = async (req, res) => {
+    const { scheduleID, clientId } = req.body
+
+    if (!scheduleID || !clientId) {
+        return res.status(400).json({ message: 'Missing required fields' })
+    }
+
+    try {
+        // Get client platform limit from dynamoDB clients table
+        const clientData = await S3BucketAndDynamoDB.getClientData()
+        console.log('clientData', clientData)
+        const twitterLimit = clientData.twitterLimit
+        const facebookLimit = clientData.facebookLimit
+        const instagramLimit = clientData.instagramLimit
+        const linkedinLimit = clientData.linkedinLimit
+        console.log('twitterLimit', twitterLimit)
+        console.log('facebookLimit', facebookLimit)
+        console.log('instagramLimit', instagramLimit)
+        console.log('linkedinLimit', linkedinLimit)
+
+        // Check if any post is published with the scheduleID
+        const posts = await S3BucketAndDynamoDB.getPosts(scheduleID)
+        console.log('posts', posts)
+        if (posts.length > 0) {
+            for (const post of posts) {
+                if (post.isPublished) {
+                    return res.status(400).json({ message: 'Post already published' })
+                }
+            }
+        }
+        // Check if number of posts are less than platform limit
+        const platformLimits = {
+            twitter: twitterLimit,
+            facebook: facebookLimit,
+            instagram: instagramLimit,
+            linkedin: linkedinLimit,
+        }
+
+        for (const platform of platformLimits) {
+            const postCount = await S3BucketAndDynamoDB.getPostCount(platform)
+            if (postCount < platformLimits[platform]) {
+                return res.status(200).json({ message: 'Schedule ID is valid' })
+            }
+        }
+        return res.status(400).json({ message: 'Schedule ID is not valid' })
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message })
     }
 }
