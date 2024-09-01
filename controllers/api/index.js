@@ -322,7 +322,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
             linkedin: linkedinLimit,
         }
 
-        for (const platform of platforms) {
+        for (const platform of platformLimits) {
             const postCount = await S3BucketAndDynamoDB.getPostCount(platform)
             if (postCount < platformLimits[platform]) {
                 return res.status(200).json({ message: 'Schedule ID is valid' })
