@@ -3,6 +3,7 @@ import boto3
 import logging
 import random
 import base64
+import datetime
 import io
 import os
 import time
@@ -13,7 +14,19 @@ logging.basicConfig()
 logger.setLevel(logging.INFO)
 
 sagemaker_client = boto3.client("sagemaker-runtime")
-endpoint_name = os.environ["ENDPOINT_NAME"]
+sagemaker = boto3.client('sagemaker')
+s3 = boto3.client('s3')
+dynamodb = boto3.client('dynamodb')
+
+def check_endpoint_status(endpoint_name):
+    try:
+        response = sagemaker.describe_endpoint(EndpointName=endpoint_name)
+        status = response['EndpointStatus']
+        return status
+    except Exception as e:
+        print(f"Error checking endpoint status: {str(e)}")
+        return None
+
 
 def update_seed(prompt_dict, seed=None):
     """
@@ -26,20 +39,6 @@ def update_seed(prompt_dict, seed=None):
     Returns:
         dict: The updated prompt dictionary with the seed value set for the KSampler node.
     """
-    
-    # ----- checking if the endpoint is in service
-    response = sagemaker_client.describe_endpoint(EndpointName=endpoint_name)
-    status = response['EndpointStatus']
-
-    if status != 'InService':
-        sagemaker_client.start_endpoint(EndpointName=endpoint_name)
-        while status != 'InService':
-            time.sleep(10)
-            response = sagemaker_client.describe_endpoint(
-                EndpointName=endpoint_name)
-            status = response['EndpointStatus']
-    # ----------------------------------------------------------------
-
     # set seed for KSampler node
     for i in prompt_dict:
         if "inputs" in prompt_dict[i]:
@@ -48,11 +47,15 @@ def update_seed(prompt_dict, seed=None):
                 and "seed" in prompt_dict[i]["inputs"]
             ):
                 if seed is None:
-                    prompt_dict[i]["inputs"]["seed"] = random.randint(0, int(1e10))
+                    # TODO: this generation is not same as the one in the activepieces workflow
+                    generated_seed = random.randint(0, int(1e10))
+                    prompt_dict[i]["inputs"]["seed"] = generated_seed
+                    logger.info("Generated seed: %s", generated_seed)
                 else:
-                    prompt_dict[i]["inputs"]["seed"] = int(seed)
+                    generated_seed = random.randint(0, int(1e10))
+                    prompt_dict[i]["inputs"]["seed"] = generated_seed
+                    logger.info("Set seed: %s", seed)
     return prompt_dict
-
 
 def update_prompt_text(prompt_dict, positive_prompt, negative_prompt):
     """
@@ -103,10 +106,15 @@ def invoke_from_prompt(prompt_file, positive_prompt, negative_prompt, seed=None)
         prompt_text = prompt_file.read()
 
     prompt_dict = json.loads(prompt_text)
+    logger.info("seed: %s", seed)
     prompt_dict = update_seed(prompt_dict, seed)
+    logger.info("seed: %s", seed)
+    logger.info("prompt_dict: %s", prompt_dict)
     prompt_dict = update_prompt_text(prompt_dict, positive_prompt, negative_prompt)
+    logger.info("prompt_dict: %s", prompt_dict)
     prompt_text = json.dumps(prompt_dict)
 
+    endpoint_name = os.environ["ENDPOINT_NAME"]
     content_type = "application/json"
     accept = "*/*"
     payload = prompt_text
@@ -118,6 +126,10 @@ def invoke_from_prompt(prompt_file, positive_prompt, negative_prompt, seed=None)
         Accept=accept,
         Body=payload,
     )
+    logger.info("Response from sagemaker:")
+    logger.info(response)
+    # TODO: check response status code and return if not 200
+    
     return response
 
 
@@ -132,21 +144,102 @@ def lambda_handler(event: dict, context: dict):
     Returns:
         dict: The response data for lambda function URL.
     """
+    try:
+        bucket_name = os.environ['AWS_S3_BUCKET_NAME']
+        object_key = f"img_{int(time.time())}"
+        endpoint_name = os.environ['ENDPOINT_NAME']
+    except KeyError as e:
+        logger.error(f"Error: {e}")
+        return {
+            "statusCode": 400,
+            "body": json.dumps(
+                {
+                    "error": "Missing required parameter",
+                }
+            ),
+        }
+        
     logger.info("Event:")
     logger.info(json.dumps(event, indent=2))
     request = json.loads(event["body"])
 
     try:
         prompt_file = request.get("prompt_file", "workflow_api.json")
+        schedule_id = request.get("scheduleID")
+        
+        client_id = request.get("clientID")
+        logger.info("First client_id: %s", client_id)
+        
+        client_id = request.get("clientID", "techfi1992")
+        logger.info("client_id: %s", client_id)
+        
         positive_prompt = request["positive_prompt"]
         negative_prompt = request.get("negative_prompt", "")
-        seed = request.get("seed")
-        response = invoke_from_prompt(
-            prompt_file=prompt_file,
-            positive_prompt=positive_prompt,
-            negative_prompt=negative_prompt,
-            seed=seed,
-        )
+        
+        logger.info("schedule_id: %s", schedule_id)
+        # Check endpoint status
+        status = check_endpoint_status(endpoint_name)
+        print(f"Creating status: {status}")
+        if status == 'InService':
+            for _ in range(3):
+                response = invoke_from_prompt(
+                    prompt_file=prompt_file,
+                    positive_prompt=positive_prompt,
+                    negative_prompt=negative_prompt,
+                )
+                response_body = response["Body"].read()
+                image_id = f"image_{int(time.time())}_{random.randint(0, 1000)}"
+                object_key = f"{client_id}/{image_id}"
+                # store the image in s3 bucket
+                try:
+                    s3.put_object(Bucket=bucket_name, Key=object_key, Body=response_body)
+                    image_url = f"https://{bucket_name}.s3.amazonaws.com/{object_key}"
+                except Exception as e:
+                    logger.error(f"Error: {e}")
+                    return {
+                        "statusCode": 500,
+                        "body": json.dumps(
+                            {
+                                "error": "s3 put object was not successful",
+                            }
+                        ),
+                    }
+                # Add a new item to the dynamoDB table
+                try:
+                    logger.info("Adding item to dynamoDB table")
+                    logger.info("schedule_id: %s", schedule_id)
+                    logger.info("image_id: %s", image_id)
+                    logger.info("client_id: %s", client_id)
+                    logger.info("image_url: %s", image_url)
+                    logger.info("negative_prompt: %s", negative_prompt)
+                    logger.info("positive_prompt: %s", positive_prompt)
+                    dynamo_db_item = {
+                        "scheduleID": {"S": schedule_id},
+                        "imageID": {"S": image_id},
+                        "clientID": {"S": client_id},
+                        "imageURL": {"S": image_url},
+                        "negative_prompt": {"S": negative_prompt},
+                        "positive_prompt": {"S": positive_prompt},
+                        "postID": {"S": str(random.randint(100, 999))},  # Assuming postID is generated randomly
+                        "uploadedAt": {"S": datetime.datetime.utcnow().isoformat() + "Z"}
+                    }
+                    dynamodb.put_item(
+                        TableName=os.environ['AWS_DYNAMODB_IMAGES_TABLE_NAME'],
+                        Item=dynamo_db_item
+                    )
+                except Exception as e:
+                    logger.error(f"Error: {e}")
+                    return {
+                        "statusCode": 500,
+                        "body": json.dumps(
+                            {
+                                "error": "Failed to save image to dynamoDB",
+                            }
+                        ),
+                    }
+                
+        else:
+            return "Endpoint {} is not in service. Current status: {}".format(endpoint_name, status)
     except KeyError as e:
         logger.error(f"Error: {e}")
         return {
@@ -158,22 +251,27 @@ def lambda_handler(event: dict, context: dict):
             ),
         }
 
-    image_data = response["Body"].read()
-
-    result = {
-        "headers": {"Content-Type": response["ContentType"]},
-        "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
-        "body": base64.b64encode(io.BytesIO(image_data).getvalue()).decode("utf-8"),
-        "isBase64Encoded": True,
-    }
-    return result
+    # Fetch last 3 items from dynamodb
+    response = dynamodb.query(
+        TableName=os.environ['AWS_DYNAMODB_IMAGES_TABLE_NAME'],
+        KeyConditionExpression='scheduleID = :scheduleID',
+        ExpressionAttributeValues={
+            ':scheduleID': {'S': schedule_id}
+        },
+        ScanIndexForward=False,
+        Limit=3
+    )
+    items = response.get('Items', [])
+    # return urls of the images
+    urls = [item['imageURL']['S'] for item in items]
+    return urls
 
 
 if __name__ == "__main__":
     import sys
 
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    event = {
-        "body": "{\"positive_prompt\": \"hill happy dog\",\"negative_prompt\": \"hill\",\"prompt_file\": \"workflow_api.json\",\"seed\": 123}"
-    }
+    # event = {
+    #     "body": "{\"positive_prompt\": \"hill happy dog\",\"negative_prompt\": \"hill\",\"prompt_file\": \"workflow_api.json\",\"seed\": 123}"
+    # }
     lambda_handler(event, None)
