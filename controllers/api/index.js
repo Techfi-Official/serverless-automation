@@ -224,6 +224,7 @@ module.exports.sendEmail = async (req, res) => {
         email,
         platform,
         companyName,
+        scheduleID
     } = req.body
     // Basic validation
     if (
@@ -274,6 +275,27 @@ module.exports.sendEmail = async (req, res) => {
 
         // Send email
         await sgMail.send(msg)
+        // Add email to dynamoDB
+        const emailData = {
+            clientID: email,
+            email: email,
+            platform: platform,
+            createdAt: new Date().toISOString(),
+            companyName: companyName,
+            emailSent: true,
+            scheduleID: scheduleID,
+            postBody: postBody,
+            isPublished: false,
+            publishedAt: null,
+            imageSrc1: imageSrc1,
+            imageSrc2: imageSrc2,
+            imageSrc3: imageSrc3,
+            approveLink: approveLink,
+            disapproveLink: disapproveLink,
+            editLink: editLink,
+        }
+
+        await S3BucketAndDynamoDB.writeDynamoDB(emailData)
 
         res.status(200).json({ message: 'Email sent successfully!' })
     } catch (error) {
