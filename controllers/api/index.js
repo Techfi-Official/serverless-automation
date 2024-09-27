@@ -290,7 +290,11 @@ module.exports.sendEmail = async (req, res) => {
             disapproveLink: disapproveLink,
             editLink: editLink,
         })
-        
+
+        // Check if the post was recorded successfully
+        if (!postRecorded) {
+            return res.status(500).json({ message: 'Failed to record the post in DynamoDB' });
+        }
 
         // Send email
         await sgMail.send(msg)
