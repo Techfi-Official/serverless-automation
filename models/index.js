@@ -75,6 +75,7 @@ class S3BucketAndDynamoDB {
 
     writeDynamoDB() {
         return writeDynamoDB(
+            this.clientID,
             this.scheduleID,
             this.imageId,
             this.instruction,
