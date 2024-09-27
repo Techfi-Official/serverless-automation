@@ -276,7 +276,6 @@ module.exports.sendEmail = async (req, res) => {
             platform: platform,
             createdAt: new Date().toISOString(),
             companyName: companyName,
-            emailSent: true,
             scheduleID: scheduleID,
             postBody: postBody,
             isPublished: false,
