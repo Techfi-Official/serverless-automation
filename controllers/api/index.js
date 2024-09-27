@@ -238,8 +238,6 @@ module.exports.sendEmail = async (req, res) => {
         return res.status(400).json({ message: 'Missing required fields' })
     }
 
-    // TODO: Before sending email populate the email in dyanmoDB
-
     // Define a mapping from platforms to their respective email template IDs
     const templateIdMap = {
         twitter: process.env.TWEET_EMAIL_TEMPLATE_ID,
@@ -259,9 +257,9 @@ module.exports.sendEmail = async (req, res) => {
         const msg = {
             to: email,
             from: process.env.EMAIL_FROM,
-            templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
+            templateId: platformTemplateId, // Use the platform specific template ID
             dynamicTemplateData: {
-                subject: 'Check Your New Generated Tweet!',
+                subject: 'Check Your New Generated Post!',
                 imageSrc1,
                 imageSrc2,
                 imageSrc3,
@@ -273,10 +271,8 @@ module.exports.sendEmail = async (req, res) => {
             },
         }
 
-        // Send email
-        await sgMail.send(msg)
-        // Add email to dynamoDB
-        const emailData = {
+        // Record the post before sending email
+        const postRecorded = await S3BucketAndDynamoDB.writeDynamoDB({
             clientID: email,
             email: email,
             platform: platform,
@@ -293,13 +289,15 @@ module.exports.sendEmail = async (req, res) => {
             approveLink: approveLink,
             disapproveLink: disapproveLink,
             editLink: editLink,
-        }
+        })
+        
 
-        await S3BucketAndDynamoDB.writeDynamoDB(emailData)
+        // Send email
+        await sgMail.send(msg)
 
         res.status(200).json({ message: 'Email sent successfully!' })
     } catch (error) {
-        // console.error('Email sending error:', error);
+        console.error('Email sending error:', error);
         res.status(500).json({
             message: 'Failed to send email',
             error: error.message,
