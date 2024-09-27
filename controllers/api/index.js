@@ -57,7 +57,7 @@ module.exports.getDataRenderHTML = async (req, res) => {
         })
     }
 }
-
+// TODO: I think this function is not used
 module.exports.postDataAndImageAI = async (req, res) => {
     const data = req.body || null
 
@@ -316,6 +316,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
 
     try {
         // Get client platform limit from dynamoDB clients table
+        // TODO: Below line is not gonna work because we are using some other table then posts
         const clientData = await S3BucketAndDynamoDB.getClientData()
         console.log('clientData', clientData)
         const twitterLimit = clientData.twitterLimit
@@ -346,7 +347,9 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         }
 
         for (const platform of platformLimits) {
-            const postCount = await S3BucketAndDynamoDB.getPostCount(platform)
+            // TODO: This function not implemented yet default is 5
+            // const postCount = await S3BucketAndDynamoDB.getPostCount(platform)
+            const postCount = 5
             if (postCount < platformLimits[platform]) {
                 return res.status(200).json({ message: 'Schedule ID is valid' })
             }
