@@ -64,7 +64,6 @@ module.exports.postDataAndImageAI = async (req, res) => {
     // Validate the request body
     if (
         !data?.positive_instruction ||
-        !data?.postID ||
         !data?.platform
     ) {
         res.status(400).send(`Invalid Request`)
@@ -115,7 +114,6 @@ module.exports.postDataAndImageAI = async (req, res) => {
             try {
                 for (const imgData of image) {
                     const instanceData = new S3BucketAndDynamoDB(
-                        data.postID,
                         nanoid(),
                         data.positive_instruction,
                         data.platform
@@ -147,7 +145,6 @@ module.exports.postWebhook = async (req, res) => {
     const data = req.body || null
 
     if (
-        !data?.postID ||
         !data?.mainText ||
         !data?.platform ||
         !data?.textInstruction ||
@@ -160,7 +157,6 @@ module.exports.postWebhook = async (req, res) => {
     }
 
     const input = {
-        postID: data?.postID,
         clientID: data?.clientID,
         mainText: data.mainText,
         platform: data.platform,
@@ -213,6 +209,8 @@ module.exports.wakeAIModel = async (req, res) => {
 }
 
 module.exports.sendEmail = async (req, res) => {
+    console.log('sendEmail function called')
+    console.log('req.body', req.body)
     const {
         imageSrc1,
         imageSrc2,
@@ -237,7 +235,7 @@ module.exports.sendEmail = async (req, res) => {
     ) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
-
+    console.log('email', email)
     // Define a mapping from platforms to their respective email template IDs
     const templateIdMap = {
         twitter: process.env.TWEET_EMAIL_TEMPLATE_ID,
@@ -245,7 +243,7 @@ module.exports.sendEmail = async (req, res) => {
         instagram: process.env.INSTAGRAM_EMAIL_TEMPLATE_ID,
         linkedin: process.env.LINKEDIN_EMAIL_TEMPLATE_ID,
     }
-
+    console.log('platform', platform)
     const platformTemplateId = templateIdMap[platform] // Fetch the template ID based on the platform
 
     if (!platformTemplateId) {

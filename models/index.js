@@ -11,12 +11,25 @@ const {
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(scheduleID, clientId, imageId, instruction, platform, imageUrl) {
+    constructor(scheduleID, clientId, imageId, instruction, platform, imageUrl, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
         this.imageId = imageId || ''
         this.clientId = clientId || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
         this.imageUrl = imageUrl || ''
+        this.email = email || ''
+        this.companyName = companyName || ''
+        this.postBody = postBody || ''
+        this.isPublished = isPublished || ''
+        this.publishedAt = publishedAt || ''
+        this.imageSrc1 = imageSrc1 || ''
+        this.imageSrc2 = imageSrc2 || ''
+        this.imageSrc3 = imageSrc3 || ''
+        this.approveLink = approveLink || ''
+        this.disapproveLink = disapproveLink || ''
+        this.editLink = editLink || ''
+        this.scheduleID = scheduleID || ''
+
         if (scheduleID != null) {
             this.scheduleID = scheduleID
         } else {
@@ -33,7 +46,7 @@ class S3BucketAndDynamoDB {
     }
     // ---- GET & POST S3BUCKET
     async getAllS3Data() {
-        return await readALLS3BucketData(this.postID)
+        return await readALLS3BucketData(this.scheduleID)
     }
     // GET POST COUNT
     async getPostCount(platform) {
@@ -42,31 +55,42 @@ class S3BucketAndDynamoDB {
 
     // ---- GET & POST S3BUCKET
     async getSortedS3Data(imageId) {
-        return await readSpecificS3BucketData(this.postID, imageId)
+        return await readSpecificS3BucketData(this.scheduleID, imageId)
     }
 
     async postS3Data(data) {
         this.writeDynamoDB()
-        return await writeS3BucketData(this.postID, this.imageId, data)
+        return await writeS3BucketData(this.scheduleID, this.imageId, data)
     }
 
     getS3URLData() {
-        return readS3URLBucketData(this.postID, this.imageId)
+        return readS3URLBucketData(this.scheduleID, this.imageId)
     }
 
     // --------------------------------
 
     getDynamoDBdata() {
-        return readDynamoDB(this.postID)
+        return readDynamoDB(this.scheduleID)
     }
 
     writeDynamoDB() {
         return writeDynamoDB(
-            this.postID,
+            this.scheduleID,
             this.imageId,
             this.instruction,
             this.platform,
-            this.imageUrl
+            this.imageUrl,
+            this.email,
+            this.companyName,
+            this.postBody,
+            this.isPublished,
+            this.publishedAt,
+            this.imageSrc1,
+            this.imageSrc2,
+            this.imageSrc3,
+            this.approveLink,
+            this.disapproveLink,
+            this.editLink,
         )
     }
 }
