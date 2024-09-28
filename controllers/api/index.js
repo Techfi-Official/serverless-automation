@@ -253,6 +253,7 @@ module.exports.sendEmail = async (req, res) => {
     try {
         // Create an instance of S3BucketAndDynamoDB
         const clientID = email.split('@')[0]
+        console.log('ozan clientID', clientID)
         const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(
             scheduleID, // Pass the required parameters
             clientID,
