@@ -246,22 +246,21 @@ async function readPostCount(platform) {
     }
 }
 
-async function writeDynamoDB(scheduleID, imageId, platform, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink, clientId) {
+async function writeDynamoDB(scheduleID, clientID, instruction, platform, imageUrl, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
         Item: {
             scheduleID: scheduleID,
-            imageId: imageId,
+            clientID: clientID,
+            instruction: instruction,
             platform: platform,
-            createdAt: new Date().toISOString(), // ISO string format timestamp
-            updatedAt: new Date().toISOString(),
+            imageUrl: imageUrl,
             email: email,
             companyName: companyName,
             postBody: postBody,
             isPublished: isPublished,
             publishedAt: publishedAt,
-            clientId: clientId,
             imageSrc1: imageSrc1,
             imageSrc2: imageSrc2,
             imageSrc3: imageSrc3,
