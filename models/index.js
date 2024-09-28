@@ -11,13 +11,10 @@ const {
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(scheduleID, clientID, imageId, instruction, platform, imageUrl, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
+    constructor(scheduleID, clientID, platform, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
         this.scheduleID = scheduleID || ''
         this.clientID = clientID || ''
-        this.imageId = imageId || ''
-        this.instruction = instruction || ''
         this.platform = platform || ''
-        this.imageUrl = imageUrl || ''
         this.email = email || ''
         this.companyName = companyName || ''
         this.postBody = postBody || ''
@@ -77,10 +74,7 @@ class S3BucketAndDynamoDB {
         return writeDynamoDB(
             this.scheduleID,
             this.clientID,
-            this.imageId,
-            this.instruction,
             this.platform,
-            this.imageUrl,
             this.email,
             this.companyName,
             this.postBody,

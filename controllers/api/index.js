@@ -257,10 +257,7 @@ module.exports.sendEmail = async (req, res) => {
         const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(
             scheduleID, // Pass the required parameters
             clientID,
-            null,       // imageId
-            null,       // instruction
             platform,
-            null,       // imageUrl
             email,
             companyName,
             postBody,
