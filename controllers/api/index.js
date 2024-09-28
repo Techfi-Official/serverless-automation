@@ -311,6 +311,7 @@ module.exports.sendEmail = async (req, res) => {
 }
 
 module.exports.approvePost = async (req, res) => {
+    console.log('approve post function is called')
     const { scheduleID, platform } = req.body
 
     // Validate the request body
@@ -320,8 +321,9 @@ module.exports.approvePost = async (req, res) => {
 
     try {
         console.log('approve post is trying')
+        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID)
         // Find the post from DynamoDB using the scheduleID
-        const post = await S3BucketAndDynamoDB.getPost(scheduleID)
+        const post = await s3BucketAndDynamoDB.getPost() // Call the method on the instance
         console.log("here are the posts", post)
 
         if (!post) {
