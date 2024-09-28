@@ -1,6 +1,5 @@
 const s3Client = require('./s3Client')
 const ddbDocClient = require('./dynamoDBClient')
-const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
 const {
     PutObjectCommand,
