@@ -281,6 +281,24 @@ module.exports.sendEmail = async (req, res) => {
             return res.status(500).json({ message: 'Failed to record the post in DynamoDB' });
         }
 
+        // Prepare the email data using the SendGrid template
+        const msg = {
+            to: email,
+            from: process.env.EMAIL_FROM,
+            templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
+            dynamicTemplateData: {
+                subject: 'Check Your New Generated Tweet!',
+                imageSrc1,
+                imageSrc2,
+                imageSrc3,
+                approveLink,
+                disapproveLink,
+                editLink,
+                postBody,
+                companyName,
+            },
+        }
+
         // Send email
         await sgMail.send(msg)
 
