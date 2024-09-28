@@ -251,42 +251,30 @@ module.exports.sendEmail = async (req, res) => {
     }
 
     try {
-        // Prepare the email data using the SendGrid template
-        const msg = {
-            to: email,
-            from: process.env.EMAIL_FROM,
-            templateId: platformTemplateId, // Use the platform specific template ID
-            dynamicTemplateData: {
-                subject: 'Check Your New Generated Post!',
-                imageSrc1,
-                imageSrc2,
-                imageSrc3,
-                approveLink,
-                disapproveLink,
-                editLink,
-                postBody,
-                companyName,
-            },
-        }
+        // Create an instance of S3BucketAndDynamoDB
+        const clientId = email.split('@')[0]
+        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(
+            scheduleID, // Pass the required parameters
+            clientId,
+            null,       // imageId
+            null,       // instruction
+            platform,
+            null,       // imageUrl
+            email,
+            companyName,
+            postBody,
+            false,      // isPublished
+            null,       // publishedAt
+            imageSrc1,
+            imageSrc2,
+            imageSrc3,
+            approveLink,
+            disapproveLink,
+            editLink
+        );
 
         // Record the post before sending email
-        const postRecorded = await S3BucketAndDynamoDB.writeDynamoDB({
-            clientID: email,
-            email: email,
-            platform: platform,
-            createdAt: new Date().toISOString(),
-            companyName: companyName,
-            scheduleID: scheduleID,
-            postBody: postBody,
-            isPublished: false,
-            publishedAt: null,
-            imageSrc1: imageSrc1,
-            imageSrc2: imageSrc2,
-            imageSrc3: imageSrc3,
-            approveLink: approveLink,
-            disapproveLink: disapproveLink,
-            editLink: editLink,
-        })
+        const postRecorded = await s3BucketAndDynamoDB.writeDynamoDB();
 
         // Check if the post was recorded successfully
         if (!postRecorded) {
