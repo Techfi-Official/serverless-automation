@@ -12,8 +12,9 @@ const {
 
 class S3BucketAndDynamoDB {
     constructor(scheduleID, clientID, imageId, instruction, platform, imageUrl, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
-        this.imageId = imageId || ''
+        this.scheduleID = scheduleID || ''
         this.clientID = clientID || ''
+        this.imageId = imageId || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
         this.imageUrl = imageUrl || ''
@@ -28,7 +29,6 @@ class S3BucketAndDynamoDB {
         this.approveLink = approveLink || ''
         this.disapproveLink = disapproveLink || ''
         this.editLink = editLink || ''
-        this.scheduleID = scheduleID || ''
 
         if (scheduleID != null) {
             this.scheduleID = scheduleID

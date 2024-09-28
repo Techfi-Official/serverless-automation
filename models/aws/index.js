@@ -154,16 +154,16 @@ async function deleteS3BucketData(ownerId, id) {
     }
 }
 
-async function readDynamoDB(scheduleID, clientId) {
+async function readDynamoDB(scheduleID, clientID) {
     console.log('Entering readDynamoDB function');
     // Configure our GET params, with the name of the table and key (partition key + sort key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        IndexName: 'clientIdCreatedAtIndex',
-        KeyConditionExpression: 'scheduleID = :scheduleID AND clientId = :clientId',
+        IndexName: 'clientIDCreatedAtIndex',
+        KeyConditionExpression: 'scheduleID = :scheduleID AND clientID = :clientID',
         ExpressionAttributeValues: {
             ':scheduleID': scheduleID,
-            ':clientId': clientId,
+            ':clientID': clientID,
         },
         ProjectionExpression: 'imageId, platform, instruction, imageUrl',
         ScanIndexForward: global.sharedData?.isSorted ?? false,
