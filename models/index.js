@@ -75,10 +75,12 @@ class S3BucketAndDynamoDB {
 
     writeDynamoDB() {
         return writeDynamoDB(
-            this.clientID,
             this.scheduleID,
+            this.clientID,
             this.imageId,
+            this.instruction,
             this.platform,
+            this.imageUrl,
             this.email,
             this.companyName,
             this.postBody,
