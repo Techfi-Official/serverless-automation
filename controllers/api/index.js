@@ -319,6 +319,7 @@ module.exports.approvePost = async (req, res) => {
     }
 
     try {
+        console.log('approve post is trying')
         // Find the post from DynamoDB using the scheduleID
         const post = await S3BucketAndDynamoDB.getPost(scheduleID)
         console.log("here are the posts", post)
