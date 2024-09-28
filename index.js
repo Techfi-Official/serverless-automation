@@ -35,44 +35,6 @@ app.use(
         methods: ['GET', 'POST'],
     })
 )
-// // Main route
-// app.get('/', (req, res) => {
-//     const tweet = req.query.tweet
-//     res.render('index', {
-//         title: 'Server-Side Rendered Page on AWS Lambda',
-//         tweet: tweet ?? 'N/A',
-//         image: null,
-//     })
-// })
-// app.post('/new-tweet', async (req, res) => {
-//     const tweetInstructions = req.body || null
-//     //write fetch function to post tweet
-//     // if tweetInstructions is null, return error
-//     if (!tweetInstructions) {
-//         res.status(400).send('Invalid Request')
-//     } else {
-//         try {
-//             await axios.post(
-//                 process.env.API_URL,
-//                 JSON.stringify(tweetInstructions),
-//                 {
-//                     headers: {
-//                         'Content-Type': 'application/json',
-//                     },
-//                 }
-//             )
-//             return res
-//                 .status(201)
-//                 .send(
-//                     '<h3>Message sent successfully please check your Email Address</h3>'
-//                 )
-//         } catch (error) {
-//             res.status(500).send(
-//                 'Something went wrong, please contact to <b>techfi1992@gmail.com</b>'
-//             )
-//         }
-//     }
-// })
 
 app.get('/test', (req, res) => {
     res.status(200).send('WHY ARE THE MESSAGES FROM THE MESSAGES NOT WORKING')
