@@ -1,5 +1,6 @@
 const s3Client = require('./s3Client')
 const ddbDocClient = require('./dynamoDBClient')
+const { QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
 const {
     PutObjectCommand,
@@ -188,23 +189,22 @@ async function readDynamoDB(scheduleID, clientID) {
         throw new Error('unable to read data from DynamoDB')
     }
 }
-// Create readPostData
+// Returns all the posts with that scheduleID
 async function readPostsData(scheduleID) {
-    // Configure our GET params, with the name of the table and key (partition key + sort key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        Key: {
-            scheduleID: scheduleID,
+        KeyConditionExpression: 'scheduleID = :scheduleID', // Using KeyConditionExpression
+        ExpressionAttributeValues: {
+            ':scheduleID': scheduleID,
         },
-    }
+    };
 
-    // Create a GET command to send to DynamoDB
-    const command = new QueryCommand(params)
+    const command = new QueryCommand(params);
 
     try {
-        return await ddbDocClient.send(command)
+        return await ddbDocClient.send(command);
     } catch (err) {
-        throw new Error(err)
+        throw new Error(err);
     }
 }
 // Create readClientData

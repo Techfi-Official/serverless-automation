@@ -323,7 +323,7 @@ module.exports.approvePost = async (req, res) => {
         console.log('approve post is trying')
         const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID)
         // Find the post from DynamoDB using the scheduleID
-        const post = await s3BucketAndDynamoDB.getPost() // Call the method on the instance
+        const post = await s3BucketAndDynamoDB.getPosts() // Call the method on the instance
         console.log("here are the posts", post)
 
         if (!post) {
@@ -369,7 +369,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         console.log('linkedinLimit', linkedinLimit)
 
         // Check if any post is published with the scheduleID
-        const posts = await S3BucketAndDynamoDB.getPost(scheduleID)
+        const posts = await S3BucketAndDynamoDB.getPosts(scheduleID)
         console.log('posts', posts)
         if (posts.length > 0) {
             for (const post of posts) {
