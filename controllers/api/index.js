@@ -252,10 +252,10 @@ module.exports.sendEmail = async (req, res) => {
 
     try {
         // Create an instance of S3BucketAndDynamoDB
-        const clientId = email.split('@')[0]
+        const clientID = email.split('@')[0]
         const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(
             scheduleID, // Pass the required parameters
-            clientId,
+            clientID,
             null,       // imageId
             null,       // instruction
             platform,
@@ -313,9 +313,9 @@ module.exports.sendEmail = async (req, res) => {
 }
 
 module.exports.checkScheduleIdValidity = async (req, res) => {
-    const { scheduleID, clientId } = req.body
+    const { scheduleID, clientID } = req.body
 
-    if (!scheduleID || !clientId) {
+    if (!scheduleID || !clientID) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
 

@@ -11,9 +11,9 @@ const {
 } = require('./aws')
 
 class S3BucketAndDynamoDB {
-    constructor(scheduleID, clientId, imageId, instruction, platform, imageUrl, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
+    constructor(scheduleID, clientID, imageId, instruction, platform, imageUrl, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
         this.imageId = imageId || ''
-        this.clientId = clientId || ''
+        this.clientID = clientID || ''
         this.instruction = instruction || ''
         this.platform = platform || ''
         this.imageUrl = imageUrl || ''
@@ -38,7 +38,7 @@ class S3BucketAndDynamoDB {
     }
     // GET CLIENT DATA
     async getClientData() {
-        return await readClientData(this.clientId)
+        return await readClientData(this.clientID)
     }
     // CHECK IF POST IS PUBLISHED
     async getPosts() {
