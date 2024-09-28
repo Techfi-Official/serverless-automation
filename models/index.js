@@ -38,7 +38,7 @@ class S3BucketAndDynamoDB {
         return await readClientData(this.clientID)
     }
     // CHECK IF POST IS PUBLISHED
-    async getPosts() {
+    async getPost() {
         return await readPostsData(this.scheduleID)
     }
     // ---- GET & POST S3BUCKET

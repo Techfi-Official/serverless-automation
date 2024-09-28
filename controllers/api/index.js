@@ -310,6 +310,40 @@ module.exports.sendEmail = async (req, res) => {
     }
 }
 
+module.exports.approvePost = async (req, res) => {
+    const { scheduleID, platform } = req.body
+
+    // Validate the request body
+    if (!scheduleID || !platform) {
+        return res.status(400).json({ message: 'Missing required fields' })
+    }
+
+    try {
+        // Find the post from DynamoDB using the scheduleID
+        const post = await S3BucketAndDynamoDB.getPost(scheduleID)
+        console.log("here are the posts", post)
+
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' })
+        }
+
+        // Update the post to make isPublished true and set publishedAt to current date
+        post.isPublished = true
+        post.publishedAt = new Date().toISOString()
+
+
+        console.log('updating the post', post)
+        // Save the updated post back to DynamoDB
+        const updatedPost = await S3BucketAndDynamoDB.writeDynamoDB(post)
+        console.log('after update')
+
+        res.status(200).json({ message: 'Post approved successfully', post: updatedPost })
+    } catch (error) {
+        console.error('Error approving post:', error)
+        res.status(500).json({ message: 'Internal Server Error', error: error.message })
+    }
+}
+
 module.exports.checkScheduleIdValidity = async (req, res) => {
     const { scheduleID, clientID } = req.body
 
@@ -332,7 +366,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         console.log('linkedinLimit', linkedinLimit)
 
         // Check if any post is published with the scheduleID
-        const posts = await S3BucketAndDynamoDB.getPosts(scheduleID)
+        const posts = await S3BucketAndDynamoDB.getPost(scheduleID)
         console.log('posts', posts)
         if (posts.length > 0) {
             for (const post of posts) {

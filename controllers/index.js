@@ -7,6 +7,7 @@ const {
     postWebhook,
     wakeAIModel,
     sendEmail,
+    approvePost,
     checkScheduleIdValidity,
 } = require('./api')
 
@@ -17,6 +18,8 @@ router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
 router.post(['/post-data-image-ai'], authUserApiKey, postDataAndImageAI)
 
 router.post(['/send-email'], authUserApiKey, sendEmail)
+
+router.post('/approve-post', authUserApiKey, approvePost)
 
 router.post(['/post-webhook'], postWebhook)
 
