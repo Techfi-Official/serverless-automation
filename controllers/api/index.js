@@ -351,7 +351,7 @@ module.exports.approvePost = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 };
-
+// TODO: disapprove post url can be added to track when user click disapprove button in the email template 
 
 module.exports.checkScheduleIdValidity = async (req, res) => {
     const { scheduleID, clientID } = req.body
