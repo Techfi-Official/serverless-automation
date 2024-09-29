@@ -311,41 +311,47 @@ module.exports.sendEmail = async (req, res) => {
 }
 
 module.exports.approvePost = async (req, res) => {
-    console.log('approve post function is called')
-    const { scheduleID, platform } = req.body
+    console.log('approve post function is called');
+    const { scheduleID, platform } = req.body;
 
     // Validate the request body
     if (!scheduleID || !platform) {
-        return res.status(400).json({ message: 'Missing required fields' })
+        return res.status(400).json({ message: 'Missing required fields' });
     }
 
     try {
-        console.log('approve post is trying')
-        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID)
+        console.log('approve post is trying');
+        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID);
+        
         // Find the post from DynamoDB using the scheduleID
-        const post = await s3BucketAndDynamoDB.getPosts() // Call the method on the instance
-        console.log("here are the posts", post)
+        const posts = await s3BucketAndDynamoDB.getPosts(); // Call the method on the instance
+        console.log("here are the posts", posts);
 
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' })
+        if (!posts || posts.Count === 0) {
+            return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Update the post to make isPublished true and set publishedAt to current date
-        post.isPublished = true
-        post.publishedAt = new Date().toISOString()
+        // Extract the post data
+        const postsData = posts.Items;
 
+        // Iterate through each post, modify the necessary fields, and update them in DynamoDB
+        for (const post of postsData) {
+            post.isPublished = true;
+            post.publishedAt = new Date().toISOString();
 
-        console.log('updating the post', post)
-        // Save the updated post back to DynamoDB
-        const updatedPost = await S3BucketAndDynamoDB.writeDynamoDB(post)
-        console.log('after update')
+            // Save the updated post back to DynamoDB
+            console.log('updating the post', post);
+            const updatedPost = await s3BucketAndDynamoDB.writeDynamoDB(post); // Call on the instance
+            console.log('after update', updatedPost);
+        }
 
-        res.status(200).json({ message: 'Post approved successfully', post: updatedPost })
+        res.status(200).json({ message: 'Posts approved successfully', posts: postsData });
     } catch (error) {
-        console.error('Error approving post:', error)
-        res.status(500).json({ message: 'Internal Server Error', error: error.message })
+        console.error('Error approving post:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
-}
+};
+
 
 module.exports.checkScheduleIdValidity = async (req, res) => {
     const { scheduleID, clientID } = req.body
