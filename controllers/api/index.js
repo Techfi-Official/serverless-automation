@@ -312,16 +312,16 @@ module.exports.sendEmail = async (req, res) => {
 
 module.exports.approvePost = async (req, res) => {
     console.log('approve post function is called');
-    const { scheduleID, platform } = req.body;
+    const { scheduleID, platform, clientID } = req.body;
 
     // Validate the request body
-    if (!scheduleID || !platform) {
+    if (!scheduleID || !platform || !clientID) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
     try {
         console.log('approve post is trying');
-        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID);
+        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID, clientID);
         
         // Find the post from DynamoDB using the scheduleID
         const posts = await s3BucketAndDynamoDB.getPosts(); // Call the method on the instance
