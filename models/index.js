@@ -5,6 +5,7 @@ const {
     readPostCount,
     readDynamoDB,
     writeDynamoDB,
+    writePostDynamoDB,
     writeS3BucketData,
     readSpecificS3BucketData,
     readS3URLBucketData,
@@ -88,6 +89,11 @@ class S3BucketAndDynamoDB {
             this.editLink,
         )
     }
+
+    writePostDynamoDB(post) {
+        return writePostDynamoDB(post); 
+    }
+
 }
 
 module.exports.S3BucketAndDynamoDB = S3BucketAndDynamoDB

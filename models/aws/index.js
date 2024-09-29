@@ -277,11 +277,27 @@ async function writeDynamoDB(scheduleID, clientID, platform, email, companyName,
     }
 }
 
+async function writePostDynamoDB(post){
+    const params = {
+        TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+        Item: post,
+    };
+
+    const command = new PutCommand(params);
+
+    try {
+        return ddbDocClient.send(command);
+    } catch (err) {
+        throw new Error(`Error writing to DynamoDB: ${err.message}`);
+    }
+}
+
 module.exports.writeS3BucketData = writeS3BucketData
 module.exports.readALLS3BucketData = readALLS3BucketData
 module.exports.deleteS3BucketData = deleteS3BucketData
 module.exports.readDynamoDB = readDynamoDB
 module.exports.writeDynamoDB = writeDynamoDB
+module.exports.writePostDynamoDB = writePostDynamoDB
 module.exports.readClientData = readClientData
 module.exports.readPostsData = readPostsData
 module.exports.readPostCount = readPostCount

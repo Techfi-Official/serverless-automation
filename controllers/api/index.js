@@ -341,7 +341,7 @@ module.exports.approvePost = async (req, res) => {
 
             // Save the updated post back to DynamoDB
             console.log('updating the post', post);
-            const updatedPost = await s3BucketAndDynamoDB.writeDynamoDB(post); // Call on the instance
+            const updatedPost = await s3BucketAndDynamoDB.writePostDynamoDB(post); // Call on the instance
             console.log('after update', updatedPost);
         }
 
