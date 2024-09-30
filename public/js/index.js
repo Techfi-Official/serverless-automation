@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const removeButton = document.getElementById('removeButton')
     const fileInput = document.getElementById('uploadInputImage')
 
+    console.log('ozan update check')
+
     // Initially disable the regenerate post button
     regeneratePost.ariaDisabled = 'true'
     regeneratePost.disabled = true

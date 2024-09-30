@@ -111,6 +111,13 @@
             <form action="/PROD/edit-tweet" method="post">
                 <div class="form-group">
                     <label class="mb-4" for="edit_tweet">Edit text for your post</label>
+                    <!-- Add a checkbox to edit the post body -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault" data-bs-toggle="collapse" data-bs-target="#collapsePost" aria-expanded="false" aria-controls="collapsePost">
+                        <label class="form-check-label align-middle" for="flexCheckDefault">
+                            Enable to edit the post body
+                        </label>
+                    </div>
                     <div class="card">
                         <textarea
                             disabled
@@ -127,7 +134,7 @@
             <br />
             <div class="mb-2">
                 <input class="form-check-input checkbox-control" type="checkbox" value=""  id="flexCheckDefault" data-bs-toggle="collapse" data-bs-target="#collapsePost" aria-expanded="false" aria-controls="collapsePost">
-                <label class="form-check-label align-middle" for="flexCheckDefault" style="margin-left: 10px;">Regenerate body with a new prompt</label>
+                <label class="form-check-label align-middle" for="flexCheckDefault" style="margin-left: 10px;">Regenerate the post body with a new prompt</label>
             </div>
             <div class="collapse" id="collapsePost">
                 <div class="d-flex flex-column">
