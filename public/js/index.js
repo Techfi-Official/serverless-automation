@@ -1,23 +1,79 @@
 /* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', function () {
     // Get references to HTML elements
-    const regeneratePost = document.getElementById('regenerate_post')
+    const regeneratePost = document.getElementById('regeneratePostButton')
     const textAreas = document.querySelectorAll('.textarea-control')
-    const checkboxes = document.querySelectorAll('.checkbox-control')
+    const regenerateCheckboxes = document.querySelectorAll('.checkbox-control')
+    const postPromptCheckbox = document.getElementById('postPromptCheckbox')
+    const postPromptCollapse = document.getElementById('collapsePost')
+    const imagePromptCheckbox = document.getElementById('imagePromptCheckbox')
+    const imagePromptCollapse = document.getElementById('collapseImage')
     const imageContainers = document.querySelectorAll('.image-container')
     const uploadButton = document.getElementById('uploadButton')
     const removeButton = document.getElementById('removeButton')
     const fileInput = document.getElementById('uploadInputImage')
-
-    console.log('ozan update check')
+    const editPostCheckbox = document.getElementById('editPostCheckbox')
+    const publishPostButton = document.getElementById('publishPost')
+    const regeneratePostButton = document.getElementById('regeneratePostButton')
 
     // Initially disable the regenerate post button
     regeneratePost.ariaDisabled = 'true'
     regeneratePost.disabled = true
 
+    // if the both publishPostButton and regeneratePostButton are disabled, then show a #postPromptWarning
+    const postPromptWarnings = document.getElementsByClassName('postPromptWarning')
+
+    const togglePostPromptWarning = (show) => {
+        Array.from(postPromptWarnings).forEach((warning) => {
+            warning.style.display = show ? 'block' : 'none'
+        })
+    }
+
+    const toggleEditTweet = (checkbox) => {
+        console.log('ozan toggle edit tweet', checkbox)
+        const editTweet = document.getElementById('edit_tweet')
+        editTweet.disabled = !checkbox.checked
+        if (checkbox.checked) {
+            postPromptCheckbox.checked = false
+            postPromptCollapse.classList.remove('show')
+            // if the image prompt checkbox is not checked, disable the publish post button
+            if (!imagePromptCheckbox.checked) {
+                publishPostButton.disabled = false
+            }
+        }
+    }
+
+    editPostCheckbox.addEventListener('change', (e) => {
+        console.log('ozan edit post checkbox', e.target)
+        if (e.target.checked) {
+            postPromptCheckbox.checked = false
+            postPromptCollapse.classList.add('collapsed')
+        }
+        toggleEditTweet(e.target)
+    })
+
+    const togglePromptCheckbox = (checkbox) => {
+        console.log('ozan toggle prompt checkbox', checkbox)
+        if (checkbox.checked) {
+            editPostCheckbox.checked = false
+            const editTweet = document.getElementById('edit_tweet')
+            editTweet.disabled = true
+        }
+    }
+
+    postPromptCheckbox.addEventListener('change', (e) => {
+        console.log('ozan post prompt checkbox', e.target)
+        if (e.target.checked) {
+            editPostCheckbox.checked = false
+            const editTweet = document.getElementById('edit_tweet')
+            editTweet.disabled = true
+        }
+        togglePromptCheckbox(e.target)
+    })
+    
     // Helper function to determine if the button should be enabled
     const updateButtonState = () => {
-        const isAnyChecked = Array.from(checkboxes).some(
+        const isAnyChecked = Array.from(regenerateCheckboxes).some(
             (checkbox) => checkbox.checked
         )
         const isAnyFull = Array.from(textAreas).some(
@@ -25,12 +81,16 @@ document.addEventListener('DOMContentLoaded', function () {
         )
         const isEnabled = isAnyChecked && isAnyFull
 
+        togglePostPromptWarning(!isEnabled)
+
         regeneratePost.disabled = !isEnabled
         regeneratePost.ariaDisabled = !isEnabled.toString()
+        // publish post button should be disabled if the post prompt checkbox is checked
+        publishPostButton.disabled = isAnyChecked
     }
 
     // Add change listener to each checkbox
-    checkboxes.forEach((checkbox) =>
+    regenerateCheckboxes.forEach((checkbox) =>
         checkbox.addEventListener('change', updateButtonState)
     )
 
@@ -214,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
             output.innerText = `${e.target.value.length}/${maxLength} characters`
             document.getElementById(err).innerText = null
             dataForm.classList.remove('is-invalid')
+            updateButtonState()
         })
     }
 
@@ -297,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update the publish post event listener
     const selectedImage = document.querySelector('.image-container.image-selected img');
-    document.getElementById('publishPost').addEventListener('click', () => {
+    publishPostButton.addEventListener('click', () => {
         alertFire({
             title: 'Publish the post',
             imgSrc: selectedImage ? selectedImage.src : '',
@@ -313,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // TODO: Fix this. There is no difference between the image regenerate text and the post regenerate text
     // TODO: Need to have instructions for body called body_instruction and image called image_instruction
-    document.getElementById('regenerate_post').addEventListener('click', () =>
+    regeneratePostButton.addEventListener('click', () =>
         alertFire({
             title: 'Regenerate post with new prompt',
             width: '38em',
@@ -323,8 +384,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 isPublished: false,
                 body_instruction: document.getElementById('textInputPOST').value,
                 image_instruction: document.getElementById('textInputIMG').value,
-                // TODO: Fix this. regenerate_post points to the button, not the input
-                imgSrc: document.getElementById('regenerate_post').value,
+                // TODO: Fix this. regeneratePostButton points to the button, not the input
+                imgSrc: document.getElementById('regeneratePostButton').value,
             },
         })
     )
