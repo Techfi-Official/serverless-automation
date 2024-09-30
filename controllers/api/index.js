@@ -418,3 +418,17 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error', error: error.message })
     }
 }
+
+module.exports.proxy = async (req, res) => {
+    try {
+        const response = await fetch(process.env.API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(req.body),
+        });
+        const data = await response.json();
+        res.json(data);
+      } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+}

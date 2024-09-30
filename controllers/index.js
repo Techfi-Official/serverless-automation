@@ -9,9 +9,12 @@ const {
     sendEmail,
     approvePost,
     checkScheduleIdValidity,
+    proxy
 } = require('./api')
 
 router.get(['/'], getDataRenderHTML)
+
+router.post(['/proxy'], proxy)
 
 router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
 

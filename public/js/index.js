@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 undefined,
             preConfirm: async () => {
                 try {
-                    const WebhookUrl = process.env.API_URL
+                    const WebhookUrl = '/proxy';
 
                     const response = await fetch(WebhookUrl, {
                         method: 'POST',
