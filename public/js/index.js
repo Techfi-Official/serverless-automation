@@ -367,7 +367,9 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 postBody: document.getElementById('edit_tweet').value,
                 image: selectedImage ? selectedImage.src : '',
-                
+                scheduleID: new URLSearchParams(window.location.search).get('scheduleID'),
+                clientID: new URLSearchParams(window.location.search).get('clientID'),
+                isRegenerate: false,
             },
         });
     })
