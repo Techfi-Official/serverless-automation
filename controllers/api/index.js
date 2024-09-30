@@ -34,14 +34,13 @@ module.exports.getDataRenderHTML = async (req, res) => {
                 return res.status(404).send('No data found for the given ID')
             }
             console.log('tableData:', tableData);
+            console.log('tableData[0]', tableData[0].platform);
+
             console.log('tableData type:', typeof tableData);
 
-            // Fetch S3 URL data
-            const s3Data = await s3.getS3URLData()
-            console.log('s3Data:', s3Data);
             console.log('Starting Promise.all for image processing');
             // Extract the last 3 image URLs from the S3 data
-            imageUrls = s3Data.slice(-3).map((image) => image.imageUrl)
+            imageUrls = [tableData[0].imageSrc1, tableData[0].imageSrc2, tableData[0].imageSrc3];
             console.log('All image processing completed. imageUrls length:', imageUrls.length);
             console.log('imageUrls:', imageUrls);
         } else {
@@ -56,7 +55,7 @@ module.exports.getDataRenderHTML = async (req, res) => {
         // Render the 'index' template with the fetched data and send it as a response
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
-            tweet: tableData[0].instruction ?? 'N/A',
+            tweet: tableData[0].postBody ?? 'N/A',
             platform: tableData[0].platform,
             images: imageUrls,
         })

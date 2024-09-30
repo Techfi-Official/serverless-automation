@@ -166,7 +166,7 @@ async function readDynamoDB(scheduleID, clientID) {
             ':scheduleID': scheduleID,
             ':clientID': clientID,
         },
-        ProjectionExpression: 'platform',
+        ProjectionExpression: 'platform, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink',
     }
 
     // Create a GET command to send to DynamoDB
