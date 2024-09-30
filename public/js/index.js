@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
     validateForm(textInputPOST, textInputPOSTValue, 'textInputPOSTErr')
 
     function alertFire(params) {
+        console.log('ozan alertFire', params)
         Swal.fire({
             confirmButtonColor: '#0d6efd',
             cancelButtonColor: '#d33',
@@ -356,17 +357,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Update the publish post event listener
-    const selectedImage = document.querySelector('.image-container.image-selected img');
     publishPostButton.addEventListener('click', () => {
+        const selectedImage = document.querySelector('.image-container.image-selected img');
         alertFire({
             title: 'Publish the post',
             imgSrc: selectedImage ? selectedImage.src : '',
             text: 'Are you sure you want to publish this post to twitter?',
             subTitle: 'twitter',
             data: {
-                isPublished: true,
-                instruction: document.getElementById('edit_tweet').value,
+                postBody: document.getElementById('edit_tweet').value,
                 image: selectedImage ? selectedImage.src : '',
+                
             },
         });
     })
@@ -380,7 +381,6 @@ document.addEventListener('DOMContentLoaded', function () {
             text: 'Are you sure you want to generate a new post?',
             subTitle: 'Email',
             data: {
-                isPublished: false,
                 body_instruction: document.getElementById('textInputPOST').value,
                 image_instruction: document.getElementById('textInputIMG').value,
                 // TODO: Fix this. regeneratePostButton points to the button, not the input
