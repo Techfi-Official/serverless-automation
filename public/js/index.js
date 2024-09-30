@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const postPromptCheckbox = document.getElementById('postPromptCheckbox')
     const postPromptCollapse = document.getElementById('collapsePost')
     const imagePromptCheckbox = document.getElementById('imagePromptCheckbox')
-    const imagePromptCollapse = document.getElementById('collapseImage')
     const imageContainers = document.querySelectorAll('.image-container')
     const uploadButton = document.getElementById('uploadButton')
     const removeButton = document.getElementById('removeButton')
