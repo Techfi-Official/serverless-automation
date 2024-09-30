@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const publishPostButton = document.getElementById('publishPost')
     const regeneratePostButton = document.getElementById('regeneratePostButton')
 
+    const postBodyInstruction = document.getElementById('textInputPOST')
+    const imageBodyInstruction = document.getElementById('textInputIMG')
+
     // Initially disable the regenerate post button
     regeneratePost.ariaDisabled = 'true'
     regeneratePost.disabled = true
@@ -376,18 +379,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // TODO: Fix this. There is no difference between the image regenerate text and the post regenerate text
     // TODO: Need to have instructions for body called body_instruction and image called image_instruction
-    regeneratePostButton.addEventListener('click', () =>
+    regeneratePostButton.addEventListener('click', () =>{
+        console.log('ozan regeneratePostButton', regeneratePostButton)
+        const selectedImage = document.querySelector('.image-container.image-selected img');
         alertFire({
             title: 'Regenerate post with new prompt',
             width: '38em',
             text: 'Are you sure you want to generate a new post?',
             subTitle: 'Email',
             data: {
-                body_instruction: document.getElementById('textInputPOST').value,
-                image_instruction: document.getElementById('textInputIMG').value,
-                // TODO: Fix this. regeneratePostButton points to the button, not the input
-                imgSrc: document.getElementById('regeneratePostButton').value,
+                postBody: document.getElementById('textInputPOST').value,
+                scheduleID: new URLSearchParams(window.location.search).get('scheduleID'),
+                clientID: new URLSearchParams(window.location.search).get('clientID'),
+                isRegenerate: true,
+                image: selectedImage ? selectedImage.src : '',
+                isImageRegenerate: imagePromptCheckbox.checked,
+                isPostRegenerate: postPromptCheckbox.checked,
+                bodyInstruction: postBodyInstruction.value,
+                imageInstruction: imageBodyInstruction.value,
             },
         })
-    )
+    })
 })
