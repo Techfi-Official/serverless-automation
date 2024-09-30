@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const publishPostButton = document.getElementById('publishPost')
     const regeneratePostButton = document.getElementById('regeneratePostButton')
 
-    const postBodyInstruction = document.getElementById('textInputPOST')
-    const imageBodyInstruction = document.getElementById('textInputIMG')
 
     // Initially disable the regenerate post button
     regeneratePost.ariaDisabled = 'true'
@@ -371,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 postBody: document.getElementById('edit_tweet').value,
                 image: selectedImage ? selectedImage.src : '',
                 scheduleID: new URLSearchParams(window.location.search).get('scheduleID'),
-                clientID: new URLSearchParams(window.location.search).get('clientID'),
+                clientID: new URLSearchParams(window.location.search).get('id'),
                 isRegenerate: false,
             },
         });
@@ -382,6 +380,9 @@ document.addEventListener('DOMContentLoaded', function () {
     regeneratePostButton.addEventListener('click', () =>{
         console.log('ozan regeneratePostButton', regeneratePostButton)
         const selectedImage = document.querySelector('.image-container.image-selected img');
+        const postBodyInstruction = document.getElementById('textInputPOST')
+        const imageBodyInstruction = document.getElementById('textInputIMG')
+
         alertFire({
             title: 'Regenerate post with new prompt',
             width: '38em',
@@ -390,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 postBody: document.getElementById('textInputPOST').value,
                 scheduleID: new URLSearchParams(window.location.search).get('scheduleID'),
-                clientID: new URLSearchParams(window.location.search).get('clientID'),
+                clientID: new URLSearchParams(window.location.search).get('id'),
                 isRegenerate: true,
                 image: selectedImage ? selectedImage.src : '',
                 isImageRegenerate: imagePromptCheckbox.checked,
