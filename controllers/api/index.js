@@ -13,35 +13,47 @@ module.exports.getDataRenderHTML = async (req, res) => {
     let tableData = null
     let imageUrls = []
     try {
+        // Check if the request query contains an 'id' parameter
         if (req.query.id) {
-            const s3 = new S3BucketAndDynamoDB(req.query.id)
+            // Initialize an instance of S3BucketAndDynamoDB with the scheduleID and id from the request query
+            const s3 = new S3BucketAndDynamoDB(req.query.scheduleID, req.query.id)
+            // Set global shared data for limiting and sorting purposes
             global.sharedData = { limit: 4, isSorted: false }
             try {
+                // Attempt to fetch DynamoDB data
                 console.log('Attempting to get DynamoDB data...')
                 tableData = await s3.getDynamoDBdata()
             } catch (error) {
+                // Log and return an error response if DynamoDB data fetching fails
                 console.error('Error in getDynamoDBdata:', error)
                 return res.status(500).send(`Error fetching data: ${error.message}`)
             }
+            // Check if no data was returned from DynamoDB
             if (!tableData || tableData.length === 0) {
                 console.log('No data returned from getDynamoDBdata')
                 return res.status(404).send('No data found for the given ID')
             }
+            console.log('tableData:', tableData);
+            console.log('tableData type:', typeof tableData);
+
+            // Fetch S3 URL data
             const s3Data = await s3.getS3URLData()
             console.log('s3Data:', s3Data);
             console.log('Starting Promise.all for image processing');
-            // Collect last 3 image URLs
+            // Extract the last 3 image URLs from the S3 data
             imageUrls = s3Data.slice(-3).map((image) => image.imageUrl)
             console.log('All image processing completed. imageUrls length:', imageUrls.length);
             console.log('imageUrls:', imageUrls);
         } else {
+            // Return an error response if the request 'id' is missing
             res.status(400).send('Invalid Request, request id is missing')
             return
         }
 
+        // Set the response content type to HTML
         res.type('text/html')
 
-        // Send the image URLs as a response
+        // Render the 'index' template with the fetched data and send it as a response
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
             tweet: tableData[0].instruction ?? 'N/A',
@@ -49,6 +61,7 @@ module.exports.getDataRenderHTML = async (req, res) => {
             images: imageUrls,
         })
     } catch (err) {
+        // Catch any errors that occur during the process and render a default template with minimal data
         res.render('index', {
             title: 'Server-Side Rendered Page on AWS Lambda',
             tweet: 'N/A',
@@ -341,6 +354,7 @@ module.exports.approvePost = async (req, res) => {
 
             // Save the updated post back to DynamoDB
             console.log('updating the post', post);
+            post.updatedAt = new Date().toISOString();
             const updatedPost = await s3BucketAndDynamoDB.writePostDynamoDB(post); // Call on the instance
             console.log('after update', updatedPost);
         }

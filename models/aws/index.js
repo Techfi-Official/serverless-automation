@@ -156,18 +156,17 @@ async function deleteS3BucketData(ownerId, id) {
 
 async function readDynamoDB(scheduleID, clientID) {
     console.log('Entering readDynamoDB function');
+    console.log('scheduleID:', scheduleID);
+    console.log('clientID:', clientID);
     // Configure our GET params, with the name of the table and key (partition key + sort key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        IndexName: 'clientIDCreatedAtIndex',
         KeyConditionExpression: 'scheduleID = :scheduleID AND clientID = :clientID',
         ExpressionAttributeValues: {
             ':scheduleID': scheduleID,
             ':clientID': clientID,
         },
         ProjectionExpression: 'platform',
-        ScanIndexForward: global.sharedData?.isSorted ?? false,
-        Limit: global.sharedData?.limit ?? 10,
     }
 
     // Create a GET command to send to DynamoDB
@@ -264,6 +263,8 @@ async function writeDynamoDB(scheduleID, clientID, platform, email, companyName,
             approveLink: approveLink,
             disapproveLink: disapproveLink,
             editLink: editLink,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),            
         },
     }
 
@@ -281,6 +282,7 @@ async function writePostDynamoDB(post){
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
         Item: post,
+
     };
 
     const command = new PutCommand(params);

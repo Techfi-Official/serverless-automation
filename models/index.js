@@ -68,7 +68,7 @@ class S3BucketAndDynamoDB {
     // --------------------------------
 
     getDynamoDBdata() {
-        return readDynamoDB(this.scheduleID)
+        return readDynamoDB(this.scheduleID, this.clientID)
     }
 
     writeDynamoDB() {
