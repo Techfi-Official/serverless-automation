@@ -380,6 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
     regeneratePostButton.addEventListener('click', () =>{
         console.log('ozan regeneratePostButton', regeneratePostButton)
         const selectedImage = document.querySelector('.image-container.image-selected img');
+        const postBody = document.getElementById('edit_tweet').value
         const postBodyInstruction = document.getElementById('textInputPOST')
         const imageBodyInstruction = document.getElementById('textInputIMG')
         const imsSrc = document.getElementsByClassName('img-thumbnail')
@@ -393,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
             text: 'Are you sure you want to generate a new post?',
             subTitle: 'Email',
             data: {
-                postBody: document.getElementById('textInputPOST').value,
+                postBody: postBody,
                 scheduleID: new URLSearchParams(window.location.search).get('scheduleID'),
                 clientID: new URLSearchParams(window.location.search).get('id'),
                 isRegenerate: true,
