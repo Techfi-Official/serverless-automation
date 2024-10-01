@@ -382,6 +382,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedImage = document.querySelector('.image-container.image-selected img');
         const postBodyInstruction = document.getElementById('textInputPOST')
         const imageBodyInstruction = document.getElementById('textInputIMG')
+        const imsSrc = document.getElementsByClassName('img-thumbnail')
+        const imgSrc1 = imsSrc[0].src
+        const imgSrc2 = imsSrc[1].src
+        const imgSrc3 = imsSrc[2].src
 
         alertFire({
             title: 'Regenerate post with new prompt',
@@ -398,6 +402,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 isPostRegenerate: postPromptCheckbox.checked,
                 bodyInstruction: postBodyInstruction.value,
                 imageInstruction: imageBodyInstruction.value,
+                imgSrc1: imgSrc1,
+                imgSrc2: imgSrc2,
+                imgSrc3: imgSrc3,
             },
         })
     })
