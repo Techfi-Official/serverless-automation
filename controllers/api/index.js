@@ -239,7 +239,6 @@ module.exports.sendEmail = async (req, res) => {
     // Basic validation
     if (
         !approveLink ||
-        !disapproveLink ||
         !email ||
         !postBody ||
         !platform ||
