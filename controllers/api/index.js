@@ -419,8 +419,13 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
 }
 
 module.exports.proxy = async (req, res) => {
+    // extract clientID from req.body
+    const clientID = req.body.id
+    console.log('clientID', clientID)
+    const scheduleID = req.body.scheduleID
+    console.log('scheduleID', scheduleID)
     try {
-        const response = await fetch(process.env.API_URL, {
+        const response = await fetch(process.env.API_URL+`?id=${clientID}&scheduleID=${scheduleID}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(req.body),
