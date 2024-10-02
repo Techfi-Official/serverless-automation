@@ -432,7 +432,11 @@ module.exports.proxy = async (req, res) => {
         url = process.env.API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
     } else if (platform === 'facebook') {
         url = process.env.FACEBOOK_API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
-    } 
+    } else if (platform === 'instagram') {
+        url = process.env.INSTAGRAM_API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
+    } else if (platform === 'linkedin') {
+        url = process.env.LINKEDIN_API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
+    }
 
     try {
         const response = await fetch(url, {
