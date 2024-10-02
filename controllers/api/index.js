@@ -424,6 +424,16 @@ module.exports.proxy = async (req, res) => {
     console.log('clientID', clientID)
     const scheduleID = req.body.scheduleID
     console.log('scheduleID', scheduleID)
+    const platform = req.body.platform
+    console.log('platform', platform)
+    // determine the url based on platform
+    let url = ''
+    if (platform === 'twitter') {
+        url = process.env.API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
+    } else if (platform === 'facebook') {
+        url = process.env.FACEBOOK_API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
+    } 
+
     try {
         const response = await fetch(process.env.API_URL+`?id=${clientID}&scheduleID=${scheduleID}`, {
           method: 'POST',

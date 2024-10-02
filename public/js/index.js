@@ -305,6 +305,8 @@ document.addEventListener('DOMContentLoaded', function () {
             preConfirm: async () => {
                 try {
                     const WebhookUrl = '/dev/proxy';
+                    const platform = document.getElementById('platform-type').innerText
+                    params?.data.platform = platform
 
                     const response = await fetch(WebhookUrl, {
                         method: 'POST',
