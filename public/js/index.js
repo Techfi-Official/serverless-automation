@@ -305,22 +305,24 @@ document.addEventListener('DOMContentLoaded', function () {
             preConfirm: async () => {
                 try {
                     const WebhookUrl = '/dev/proxy';
-                    const platform = document.getElementById('platform-type').innerText
-                    params?.data.platform = platform
+                    const platform = document.getElementById('platform-type').innerText;
+                    if (params && params.data) {
+                        params.data.platform = platform;
+                    }
 
                     const response = await fetch(WebhookUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(params?.data),
-                    })
+                        body: JSON.stringify(params && params.data ? params.data : {}),
+                    });
                     if (!response.ok) {
                         return Swal.showValidationMessage(
                             `${JSON.stringify(await response.json())}`
-                        )
+                        );
                     }
-                    return await response.json()
+                    return await response.json();
                 } catch (error) {
-                    Swal.showValidationMessage(`Request failed: ${error}`)
+                    Swal.showValidationMessage(`Request failed: ${error}`);
                 }
             },
             allowOutsideClick: () => !Swal.isLoading(),
