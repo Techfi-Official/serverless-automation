@@ -294,7 +294,7 @@ module.exports.sendEmail = async (req, res) => {
         const msg = {
             to: email,
             from: process.env.EMAIL_FROM,
-            templateId: process.env.TWEET_EMAIL_TEMPLATE_ID,
+            templateId: platformTemplateId,
             dynamicTemplateData: {
                 subject: 'Check Your New Generated Tweet!',
                 imageSrc1,
