@@ -350,9 +350,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     allowOutsideClick: () => !Swal.isLoading(),
                 }).then(() => {
+                    const platform = document.getElementById('platform-type').innerText;
                     Swal.fire({
                         icon: 'success',
-                        title: 'Post has been saved to twitter',
+                        title: `Post has been saved to ${platform}`,
                         showConfirmButton: false,
                         timer: 1500,
                     })
@@ -364,11 +365,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update the publish post event listener
     publishPostButton.addEventListener('click', () => {
         const selectedImage = document.querySelector('.image-container.image-selected img');
+        const platform = document.getElementById('platform-type').innerText;
         alertFire({
             title: 'Publish the post',
             imgSrc: selectedImage ? selectedImage.src : '',
-            text: 'Are you sure you want to publish this post to twitter?',
-            subTitle: 'twitter',
+            text: `Are you sure you want to publish this post to ${platform}?`,
+            platform: platform,
+            subTitle: platform,
             data: {
                 postBody: document.getElementById('edit_tweet').value,
                 image: selectedImage ? selectedImage.src : '',
@@ -391,12 +394,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const imgSrc1 = imsSrc[0].src
         const imgSrc2 = imsSrc[1].src
         const imgSrc3 = imsSrc[2].src
-
+        const platform = document.getElementById('platform-type').innerText;
+        
         alertFire({
             title: 'Regenerate post with new prompt',
             width: '38em',
             text: 'Are you sure you want to generate a new post?',
             subTitle: 'Email',
+            platform: platform,
             data: {
                 postBody: postBody,
                 scheduleID: new URLSearchParams(window.location.search).get('scheduleID'),
