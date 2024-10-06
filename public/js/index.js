@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
             imageAlt: 'post image',
             text: params.text,
             icon: 'warning',
-            confirmButtonText: 'Publish',
+            confirmButtonText: params.confirmButtonText,
             showCancelButton: true,
             reverseButtons: true,
             showLoaderOnConfirm: true,
@@ -372,6 +372,7 @@ document.addEventListener('DOMContentLoaded', function () {
             text: `Are you sure you want to publish this post to ${platform}?`,
             platform: platform,
             subTitle: platform,
+            confirmButtonText: 'Publish Post',
             data: {
                 postBody: document.getElementById('edit_tweet').value,
                 image: selectedImage ? selectedImage.src : '',
@@ -401,6 +402,7 @@ document.addEventListener('DOMContentLoaded', function () {
             width: '38em',
             text: 'Are you sure you want to generate a new post?',
             subTitle: 'Email',
+            confirmButtonText: 'Regenerate Post',
             platform: platform,
             data: {
                 postBody: postBody,
