@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const platform = document.getElementById('platform-type').innerText;
                     Swal.fire({
                         icon: 'success',
-                        title: `Post has been saved to ${platform}`,
+                        title: params.confirmButtonText === 'Publish Post' ? `Post has been published to ${platform}` : `Post is being regenerated for ${platform}, new email will be sent.`,
                         showConfirmButton: false,
                         timer: 1500,
                     })
