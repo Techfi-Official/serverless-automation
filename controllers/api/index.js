@@ -425,11 +425,11 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         console.log('instagramLimit', instagramLimit)
         console.log('linkedinLimit', linkedinLimit)
 
-        // Check if any post is published wi
-        const posts = await S3BucketAndDynamoDB.getPosts()
+        // Check if any post is published
+        const posts = await s3BucketAndDynamoDB.getPosts()
         console.log('posts', posts)
-        if (posts.length > 0) {
-            for (const post of posts) {
+        if (posts.Items && posts.Items.length > 0) {
+            for (const post of posts.Items) {
                 if (post.isPublished) {
                     return res.status(200).json({ message: 'Post already published' })
                 }
@@ -443,15 +443,14 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
             linkedin: linkedinLimit,
         }
 
-        for (const platform of platformLimits) {
-            const postCount = posts.length
-            if (platformLimits[platform] <= postCount) {
-                res.status(200).json({ message: 'Disable regeneration for this platform' })
-                return
-            }
+        const postCount = posts.Items ? posts.Items.length : 0
+        if (platformLimits[platform] <= postCount) {
+            return res.status(200).json({ message: 'Disable regeneration for this platform' })
         }
+        
         return res.status(200).json({ message: 'Schedule ID is valid' })
     } catch (error) {
+        console.error('Error in checkScheduleIdValidity:', error);
         return res.status(500).json({ message: 'Internal Server Error', error: error.message })
     }
 }
