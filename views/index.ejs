@@ -223,6 +223,8 @@
                                 $('#textInputIMG').prop('disabled', true);
                                 $("#image-gallery").addClass('disabled');
                                 $("#edit_tweet").addClass('disabled');
+                                let timerInterval = null
+                                let percent = 0
                                 // show alert
                                 Swal.fire({
                                     icon: 'error',
@@ -233,7 +235,6 @@
                                     didOpen: () => {
                                         const timer = document.getElementById('loading')
                                         Swal.showLoading()
-                                        let percent = 0
                                         timerInterval = setInterval(() => {
                                             percent += 5
                                             timer.textContent = percent
@@ -250,7 +251,8 @@
                                 // disable check boxes for regenerate post body and image
                                 $('#postPromptCheckbox').prop('disabled', true);
                                 $('#imagePromptCheckbox').prop('disabled', true);
-
+                                let timerInterval = null
+                                let percent = 0
                                 // show alert saying regenerate post is disabled for this platform
                                 Swal.fire({
                                     icon: 'info',
@@ -261,7 +263,6 @@
                                     didOpen: () => {
                                         const timer = document.getElementById('loading')
                                         Swal.showLoading()
-                                        let percent = 0
                                         timerInterval = setInterval(() => {
                                             percent += 5
                                             timer.textContent = percent
@@ -289,6 +290,7 @@
                             $('#textInputIMG').prop('disabled', true);
                             $("#image-gallery").addClass('disabled');
                             $("#edit_tweet").addClass('disabled');
+                            let timerInterval = null
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
