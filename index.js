@@ -42,6 +42,11 @@ app.get('/test', (req, res) => {
 
 app.use('/', require('./controllers'))
 
+// Add new views here
+app.get('/check-post-webhook', (req, res) => {
+    res.render('check-post-webhook') 
+})
+
 app.post('/edit-tweet', async (req, res) => {
     const newTweet = req.body || null
     //write fetch function to post tweet

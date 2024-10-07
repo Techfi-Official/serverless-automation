@@ -157,29 +157,49 @@ module.exports.postWebhook = async (req, res) => {
     const data = req.body || null
 
     if (
-        !data?.mainText ||
         !data?.platform ||
-        !data?.textInstruction ||
-        !data?.imgInstruction ||
         !data?.scheduleID ||
         !data?.clientID
     ) {
         res.status(400).send('Invalid Request')
         return
     }
+    // initialize S3BucketAndDynamoDB with scheduleID and clientID and platform
+    const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(data.scheduleID, data.clientID, data.platform)
+
+    // get latest created post with scheduleID and clientID and platform
+    const latestPosts = await s3BucketAndDynamoDB.getPosts()
+    console.log('latestPosts', latestPosts)
+    // Sort posts by createdAt in descending order and get the latest post
+    const posts = latestPosts.Items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    console.log('sorted posts', posts)
+    const latestPost = posts[0]
+    console.log('latestPost', latestPost)
 
     const input = {
         clientID: data?.clientID,
-        mainText: data.mainText,
         platform: data.platform,
-        textInstruction: data.textInstruction,
-        imgInstruction: data.imgInstruction,
         scheduleID: data.scheduleID,
+        postBody: latestPost.postBody,
+        imageSrc1: latestPost.imageSrc1,
+        imageSrc2: latestPost.imageSrc2,
+        imageSrc3: latestPost.imageSrc3,
     }
-    console.log('Success 2:', process.env.WEBHOOK_SERVER)
+    
+    let url = ''
+    if(data.platform === 'twitter') {
+        url = process.env.TWITTER_API_URL
+    } else if(data.platform === 'facebook') {
+        url = process.env.FACEBOOK_API_URL
+    } else if(data.platform === 'instagram') {
+        url = process.env.INSTAGRAM_API_URL
+    } else if(data.platform === 'linkedin') {
+        url = process.env.LINKEDIN_API_URL
+    }
+
     try {
         await axios
-            .post(`${process.env.WEBHOOK_SERVER}`, JSON.stringify(input), {
+            .post(url, JSON.stringify(input), {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -429,7 +449,7 @@ module.exports.proxy = async (req, res) => {
     // determine the url based on platform
     let url = ''
     if (platform === 'twitter') {
-        url = process.env.API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
+        url = process.env.TWITTER_API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
     } else if (platform === 'facebook') {
         url = process.env.FACEBOOK_API_URL + `?id=${clientID}&scheduleID=${scheduleID}`
     } else if (platform === 'instagram') {
