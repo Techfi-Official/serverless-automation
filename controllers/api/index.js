@@ -183,7 +183,7 @@ module.exports.postWebhook = async (req, res) => {
         platform: data.platform,
         scheduleID: data.scheduleID,
         postBody: latestPost.postBody,
-        imagege: latestPost.imageSrc1,
+        image: latestPost.imageSrc1,
         imageSrc1: latestPost.imageSrc1,
         imageSrc2: latestPost.imageSrc2,
         imageSrc3: latestPost.imageSrc3,
