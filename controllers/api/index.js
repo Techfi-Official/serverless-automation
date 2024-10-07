@@ -408,7 +408,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
     if (!scheduleID || !clientID || !platform) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
-
+    console.log('checkScheduleIdValidity function is called');
     try {
         // Get client platform limit from dynamoDB clients table
         // create new object with platform and clientID
