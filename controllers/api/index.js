@@ -178,6 +178,14 @@ module.exports.postWebhook = async (req, res) => {
     const latestPost = posts[0]
     console.log('latestPost', latestPost)
 
+    let isAnyPostPublished = false;
+    for (const post of posts) {
+        if (post.isPublished) {
+            isAnyPostPublished = true;
+            break;
+        }
+    }
+
     const input = {
         clientID: data?.clientID,
         platform: data.platform,
@@ -201,6 +209,11 @@ module.exports.postWebhook = async (req, res) => {
     }
 
     try {
+        if(isAnyPostPublished) {
+            res.status(200).json({
+                status: 'published'
+            })
+        }
         await axios
             .post(url, JSON.stringify(input), {
                 headers: {
@@ -211,6 +224,7 @@ module.exports.postWebhook = async (req, res) => {
                 res.setHeader('Content-Type', 'application/json')
                 res.status(201).json({
                     text: 'Response sent, check your email update',
+                    status: 'successfully_published'
                 })
             })
             .catch((error) => {
