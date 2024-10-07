@@ -242,7 +242,17 @@
                             }
                         },
                         error: function(xhr, status, error) {
+
                             console.error('Error:', error);
+                            // disable whole page no actions allowed
+                            $('body').addClass('disabled');
+                            $('#publishPost').prop('disabled', true);
+                            $('#regeneratePostButton').prop('disabled', true);
+                            $('#postPromptCheckbox').prop('disabled', true);
+                            $('#imagePromptCheckbox').prop('disabled', true);
+                            $('#editPostCheckbox').prop('disabled', true);
+                            $('#textInputPOST').prop('disabled', true);
+                            $('#textInputIMG').prop('disabled', true);
                         }
                     });
                 }

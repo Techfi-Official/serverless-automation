@@ -431,7 +431,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         if (posts.length > 0) {
             for (const post of posts) {
                 if (post.isPublished) {
-                    return res.status(400).json({ message: 'Post already published' })
+                    return res.status(200).json({ message: 'Post already published' })
                 }
             }
         }
@@ -446,7 +446,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         for (const platform of platformLimits) {
             const postCount = posts.length
             if (platformLimits[platform] <= postCount) {
-                res.status(400).json({ message: 'Disable regeneration for this platform' })
+                res.status(200).json({ message: 'Disable regeneration for this platform' })
                 return
             }
         }
