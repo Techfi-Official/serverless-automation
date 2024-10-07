@@ -156,6 +156,8 @@ module.exports.postDataAndImageAI = async (req, res) => {
 module.exports.postWebhook = async (req, res) => {
     const data = req.body || null
 
+    console.log('ozan data', data)
+
     if (
         !data?.platform ||
         !data?.scheduleID ||
@@ -185,7 +187,7 @@ module.exports.postWebhook = async (req, res) => {
         imageSrc2: latestPost.imageSrc2,
         imageSrc3: latestPost.imageSrc3,
     }
-    
+
     let url = ''
     if(data.platform === 'twitter') {
         url = process.env.TWITTER_API_URL
