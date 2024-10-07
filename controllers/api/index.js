@@ -412,7 +412,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
     try {
         // Get client platform limit from dynamoDB clients table
         // create new object with platform and clientID
-        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(data.scheduleID, data.clientID, data.platform)
+        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(scheduleID, clientID, platform)
         // TODO: Below line is not gonna work because we are using some other table then posts
         const clientData = await s3BucketAndDynamoDB.getClientData()
         console.log('clientData', clientData)
