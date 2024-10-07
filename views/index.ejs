@@ -221,12 +221,29 @@
                                 $('#editPostCheckbox').prop('disabled', true);
                                 $('#textInputPOST').prop('disabled', true);
                                 $('#textInputIMG').prop('disabled', true);
+                                $("#image-gallery").addClass('disabled');
+                                $("#edit_tweet").addClass('disabled');
                                 // show alert
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Oops...',
-                                    text: response.message,
+                                    html: response.message,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    didOpen: () => {
+                                        const timer = document.getElementById('loading')
+                                        Swal.showLoading()
+                                        timerInterval = setInterval(() => {
+                                            percent += 5
+                                            timer.textContent = percent
+                                        }, 150)
+                                    },
+                                    willClose: () => {
+                                        clearInterval(timerInterval)
+                                    },
+                                    allowOutsideClick: () => !Swal.isLoading(),
                                 })
+
                             } else if(response.message === 'Disable regeneration for this platform') {
                                 $('#regeneratePostButton').prop('disabled', true);
                                 // disable check boxes for regenerate post body and image
@@ -238,7 +255,22 @@
                                     icon: 'info',
                                     title: 'Regenerate Post is disabled for this platform',
                                     text: 'You can still edit the post body or image',
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    didOpen: () => {
+                                        const timer = document.getElementById('loading')
+                                        Swal.showLoading()
+                                        timerInterval = setInterval(() => {
+                                            percent += 5
+                                            timer.textContent = percent
+                                        }, 150)
+                                    },
+                                    willClose: () => {
+                                        clearInterval(timerInterval)
+                                    },
+                                    allowOutsideClick: () => !Swal.isLoading(),
                                 })
+             
                             }
                         },
                         error: function(xhr, status, error) {
@@ -253,6 +285,27 @@
                             $('#editPostCheckbox').prop('disabled', true);
                             $('#textInputPOST').prop('disabled', true);
                             $('#textInputIMG').prop('disabled', true);
+                            $("#image-gallery").addClass('disabled');
+                            $("#edit_tweet").addClass('disabled');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                html: 'Error checking post status',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    const timer = document.getElementById('loading')
+                                    Swal.showLoading()
+                                    timerInterval = setInterval(() => {
+                                        percent += 5
+                                        timer.textContent = percent
+                                    }, 150)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                },
+                                allowOutsideClick: () => !Swal.isLoading(),
+                            })
                         }
                     });
                 }
