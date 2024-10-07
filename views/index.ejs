@@ -229,7 +229,9 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Oops...',
-                                    html: response.message,
+                                    html: `
+                                    ${response.message}
+                                    <span id="loading"></span>&#37;`,
                                     timer: 3000,
                                     timerProgressBar: true,
                                     didOpen: () => {
@@ -258,6 +260,8 @@
                                     icon: 'info',
                                     title: 'Regenerate Post is disabled for this platform',
                                     text: 'You can still edit the post body or image',
+                                    html: `
+                                    <span id="loading"></span>&#37;`,
                                     timer: 3000,
                                     timerProgressBar: true,
                                     didOpen: () => {
@@ -291,16 +295,16 @@
                             $("#image-gallery").addClass('disabled');
                             $("#edit_tweet").addClass('disabled');
                             let timerInterval = null
+                            let percent = 0
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                html: 'Error checking post status',
+                                html: 'Error checking post status <span id="loading"></span>&#37;',
                                 timer: 3000,
                                 timerProgressBar: true,
                                 didOpen: () => {
                                     const timer = document.getElementById('loading')
                                     Swal.showLoading()
-                                    let percent = 0
                                     timerInterval = setInterval(() => {
                                         percent += 5
                                         timer.textContent = percent
