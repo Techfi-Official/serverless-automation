@@ -206,22 +206,25 @@ async function readPostsData(scheduleID) {
     }
 }
 // Create readClientData
-async function readClientData(clientId) {
-    // Configure our GET params, with the name of the table and key (partition key + sort key)
+async function readClientData(clientID) {
+    // Configure our GET params, with the name of the table and key (partition key)
     const params = {
         TableName: process.env.AWS_DYNAMODB_CLIENTS_TABLE_NAME,
-        Key: {
-            clientId: clientId,
+        KeyConditionExpression: 'clientID = :clientID',
+        ExpressionAttributeValues: {
+            ':clientID': clientID,
         },
     }
 
-    // Create a GET command to send to DynamoDB
+    // Create a Query command to send to DynamoDB
     const command = new QueryCommand(params)
 
     try {
-        return await ddbDocClient.send(command)
+        const result = await ddbDocClient.send(command)
+        return result.Items[0] // Assuming clientId is unique, return the first (and only) item
     } catch (err) {
-        throw new Error(err)
+        console.error('Error reading client data:', err)
+        throw new Error('Unable to read client data from DynamoDB')
     }
 }
 // Create readPostCount
