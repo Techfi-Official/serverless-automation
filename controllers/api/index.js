@@ -190,13 +190,14 @@ module.exports.postWebhook = async (req, res) => {
 
     let url = ''
     if(data.platform === 'twitter') {
-        url = process.env.TWITTER_API_URL
+        url = process.env.TWITTER_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
+
     } else if(data.platform === 'facebook') {
-        url = process.env.FACEBOOK_API_URL
+        url = process.env.FACEBOOK_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
     } else if(data.platform === 'instagram') {
-        url = process.env.INSTAGRAM_API_URL
+        url = process.env.INSTAGRAM_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
     } else if(data.platform === 'linkedin') {
-        url = process.env.LINKEDIN_API_URL
+        url = process.env.LINKEDIN_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
     }
 
     try {
