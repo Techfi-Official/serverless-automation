@@ -35,15 +35,16 @@
                     const clientID = urlParams.get('id');
                     const platform = urlParams.get('platform');
 
-                    // Simulating an API call to check post status
+                    // API call to check post status
                     $.ajax({
                         url: '/dev/post-webhook', // API endpoint for checking post status
                         type: 'POST',
-                        data: {
+                        data: JSON.stringify({
                             scheduleID: scheduleID,
                             clientID: clientID,
                             platform: platform
-                        },
+                        }),
+                        contentType: 'application/json',
                         success: function(response) {
                             console.log('response', response)
                             if (response.status === 'published') {
@@ -59,8 +60,8 @@
                                 $('#loader').hide();
                             }
                         },
-                        error: function() {
-                            console.log('error')
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log('error', textStatus, errorThrown)
                             $('#status-title').text('Error retrieving post status');
                             $('#status-message').text('There was an issue while checking the status of your post. Please try again later.');
                             $('#loader').hide();
@@ -71,6 +72,7 @@
                 // Call function to check post status
                 checkPostStatus();
             });
+        </script>
         </script>
     </body>
 </html>
