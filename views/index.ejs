@@ -189,5 +189,66 @@
         <!-- add our local file  to test locally-->
         <!-- <script src="/js/index.js"></script> -->
 
+        <script>
+            $(document).ready(function() {
+                // Function to check post status from backend
+                function checkPostStatus() {
+                    console.log('checkPostStatus')
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const scheduleID = urlParams.get('scheduleID');
+                    const clientID = urlParams.get('id');
+                    const platform = urlParams.get('platform');
+
+                    // API call to check post status
+                    $.ajax({
+                        url: '/dev/check-schedule-id-validity',
+                        type: 'POST',
+                        data: JSON.stringify({
+                            scheduleID: scheduleID,
+                            clientID: clientID,
+                            platform: platform
+                        }),
+                        contentType: 'application/json',
+                        success: function(response) {
+                            console.log('response', response)
+                            if(response.message === 'Missing required fields' || response.message === 'Post already published') {
+                                // disable whole page no actions allowed
+                                $('body').addClass('disabled');
+                                $('#publishPost').prop('disabled', true);
+                                $('#regeneratePostButton').prop('disabled', true);
+                                $('#postPromptCheckbox').prop('disabled', true);
+                                $('#imagePromptCheckbox').prop('disabled', true);
+                                $('#editPostCheckbox').prop('disabled', true);
+                                $('#textInputPOST').prop('disabled', true);
+                                $('#textInputIMG').prop('disabled', true);
+                                // show alert
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: response.message,
+                                })
+                            } else if(response.message === 'Disable regeneration for this platform') {
+                                $('#regeneratePostButton').prop('disabled', true);
+                                // disable check boxes for regenerate post body and image
+                                $('#postPromptCheckbox').prop('disabled', true);
+                                $('#imagePromptCheckbox').prop('disabled', true);
+
+                                // show alert saying regenerate post is disabled for this platform
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Regenerate Post is disabled for this platform',
+                                    text: 'You can still edit the post body or image',
+                                })
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+                checkPostStatus()
+            })
+        </script>
+
     </body>
 </html>

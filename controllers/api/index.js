@@ -403,16 +403,18 @@ module.exports.approvePost = async (req, res) => {
 // TODO: disapprove post url can be added to track when user click disapprove button in the email template 
 
 module.exports.checkScheduleIdValidity = async (req, res) => {
-    const { scheduleID, clientID } = req.body
+    const { scheduleID, clientID, platform } = req.body
 
-    if (!scheduleID || !clientID) {
+    if (!scheduleID || !clientID || !platform) {
         return res.status(400).json({ message: 'Missing required fields' })
     }
 
     try {
         // Get client platform limit from dynamoDB clients table
+        // create new object with platform and clientID
+        const s3BucketAndDynamoDB = new S3BucketAndDynamoDB(data.scheduleID, data.clientID, data.platform)
         // TODO: Below line is not gonna work because we are using some other table then posts
-        const clientData = await S3BucketAndDynamoDB.getClientData()
+        const clientData = await s3BucketAndDynamoDB.getClientData()
         console.log('clientData', clientData)
         const twitterLimit = clientData.twitterLimit
         const facebookLimit = clientData.facebookLimit
@@ -423,8 +425,8 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         console.log('instagramLimit', instagramLimit)
         console.log('linkedinLimit', linkedinLimit)
 
-        // Check if any post is published with the scheduleID
-        const posts = await S3BucketAndDynamoDB.getPosts(scheduleID)
+        // Check if any post is published wi
+        const posts = await S3BucketAndDynamoDB.getPosts()
         console.log('posts', posts)
         if (posts.length > 0) {
             for (const post of posts) {
@@ -442,14 +444,13 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
         }
 
         for (const platform of platformLimits) {
-            // TODO: This function not implemented yet default is 5
-            // const postCount = await S3BucketAndDynamoDB.getPostCount(platform)
-            const postCount = 5
-            if (postCount < platformLimits[platform]) {
-                return res.status(200).json({ message: 'Schedule ID is valid' })
+            const postCount = posts.length
+            if (platformLimits[platform] <= postCount) {
+                res.status(400).json({ message: 'Disable regeneration for this platform' })
+                return
             }
         }
-        return res.status(400).json({ message: 'Schedule ID is not valid' })
+        return res.status(200).json({ message: 'Schedule ID is valid' })
     } catch (error) {
         return res.status(500).json({ message: 'Internal Server Error', error: error.message })
     }
