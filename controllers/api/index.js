@@ -183,6 +183,7 @@ module.exports.postWebhook = async (req, res) => {
         platform: data.platform,
         scheduleID: data.scheduleID,
         postBody: latestPost.postBody,
+        imagege: latestPost.imageSrc1,
         imageSrc1: latestPost.imageSrc1,
         imageSrc2: latestPost.imageSrc2,
         imageSrc3: latestPost.imageSrc3,
@@ -190,14 +191,13 @@ module.exports.postWebhook = async (req, res) => {
 
     let url = ''
     if(data.platform === 'twitter') {
-        url = process.env.TWITTER_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
-
+        url = process.env.TWITTER_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}&platform=${data.platform}`
     } else if(data.platform === 'facebook') {
-        url = process.env.FACEBOOK_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
+        url = process.env.FACEBOOK_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}&platform=${data.platform}`
     } else if(data.platform === 'instagram') {
-        url = process.env.INSTAGRAM_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
+        url = process.env.INSTAGRAM_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}&platform=${data.platform}`
     } else if(data.platform === 'linkedin') {
-        url = process.env.LINKEDIN_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}`
+        url = process.env.LINKEDIN_API_URL + `?id=${data.clientID}&scheduleID=${data.scheduleID}&platform=${data.platform}`
     }
 
     try {
