@@ -34,6 +34,7 @@
         "helmet": "^7.1.0",
         "nanoid": "^3.3.4",
         "node-fetch": "^3.3.2",
+        "replicate": "^0.34.1",
         "sharp": "^0.33.2"
     },
     "devDependencies": {

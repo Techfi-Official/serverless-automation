@@ -71,29 +71,21 @@ class S3BucketAndDynamoDB {
         return readDynamoDB(this.scheduleID, this.clientID)
     }
 
-    writeDynamoDB() {
-        return writeDynamoDB(
-            this.scheduleID,
-            this.clientID,
-            this.platform,
-            this.email,
-            this.companyName,
-            this.postBody,
-            this.isPublished,
-            this.publishedAt,
-            this.imageSrc1,
-            this.imageSrc2,
-            this.imageSrc3,
-            this.approveLink,
-            this.disapproveLink,
-            this.editLink,
-        )
+    writeDynamoDB(tableName, item) {
+        return writeDynamoDB(tableName, item)
     }
 
     writePostDynamoDB(post) {
-        return writePostDynamoDB(post); 
+        return writePostDynamoDB(post);
     }
 
+    async writeImageS3(imageKey, imageBuffer) {
+        return await writeS3BucketData(this.scheduleID, this.clientID, imageKey, imageBuffer)
+    }
+
+    async writeImageDynamoDB(tableName, item) {
+        return await writeDynamoDB(tableName, item)
+    }
 }
 
 module.exports.S3BucketAndDynamoDB = S3BucketAndDynamoDB

@@ -9,7 +9,8 @@ const {
     sendEmail,
     approvePost,
     checkScheduleIdValidity,
-    proxy
+    proxy,
+    getFluxImage
 } = require('./api')
 
 router.get(['/'], getDataRenderHTML)
@@ -17,6 +18,8 @@ router.get(['/'], getDataRenderHTML)
 router.post(['/proxy'], proxy)
 
 router.get(['/wake-ai-model'], authUserApiKey, wakeAIModel)
+
+router.post(['/get-flux-image'], authUserApiKey, getFluxImage)
 
 router.post(['/post-data-image-ai'], authUserApiKey, postDataAndImageAI)
 

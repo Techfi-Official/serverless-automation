@@ -9,14 +9,11 @@ const {
 } = require('@aws-sdk/client-s3')
 const { QueryCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
 
-// Writes a fragment's data to an S3 Object in a Bucket
-// https://github.com/awsdocs/aws-sdk-for-javascript-v3/blob/main/doc_source/s3-example-creating-buckets.md#upload-an-existing-object-to-an-amazon-s3-bucket
-async function writeS3BucketData(scheduleID, imageId, data) {
+async function writeS3BucketData(scheduleID, clientID, imageKey, data) {
     // Create the PUT API params from our details
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
-        // Our key will be a mix of the ownerID and fragment id, written as a path
-        Key: `${scheduleID}/${imageId}`,
+        Key: `${scheduleID}/${clientID}/${imageKey}`,
         Body: data,
         ContentType: 'image/png',
     }
@@ -247,28 +244,11 @@ async function readPostCount(platform) {
     }
 }
 
-async function writeDynamoDB(scheduleID, clientID, platform, email, companyName, postBody, isPublished, publishedAt, imageSrc1, imageSrc2, imageSrc3, approveLink, disapproveLink, editLink) {
+async function writeDynamoDB(tableName, item) {
     // Configure our PUT params, with the name of the table and item (attributes and keys)
     const params = {
-        TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
-        Item: {
-            scheduleID: scheduleID,
-            clientID: clientID,
-            platform: platform,
-            email: email,
-            companyName: companyName,
-            postBody: postBody,
-            isPublished: isPublished,
-            publishedAt: publishedAt,
-            imageSrc1: imageSrc1,
-            imageSrc2: imageSrc2,
-            imageSrc3: imageSrc3,
-            approveLink: approveLink,
-            disapproveLink: disapproveLink,
-            editLink: editLink,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),            
-        },
+        TableName: tableName,
+        Item: item,
     }
 
     // Create a PUT command to send to DynamoDB
@@ -280,7 +260,7 @@ async function writeDynamoDB(scheduleID, clientID, platform, email, companyName,
         throw new Error(err)
     }
 }
-
+// TODO: Remove this function and replace with writeDynamoDB whereever it's used
 async function writePostDynamoDB(post){
     const params = {
         TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
@@ -296,6 +276,7 @@ async function writePostDynamoDB(post){
         throw new Error(`Error writing to DynamoDB: ${err.message}`);
     }
 }
+
 
 module.exports.writeS3BucketData = writeS3BucketData
 module.exports.readALLS3BucketData = readALLS3BucketData

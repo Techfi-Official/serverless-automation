@@ -4,6 +4,7 @@ const sgMail = require('@sendgrid/mail')
 const crypto = require('crypto')
 const aws4  = require('aws4')
 const https = require('https')
+const Replicate = require('replicate');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
@@ -318,9 +319,24 @@ module.exports.sendEmail = async (req, res) => {
             disapproveLink,
             editLink
         );
-
+        // create a new object with the following properties:
+        const post = {
+            clientID: clientID,
+            platform: platform,
+            email: email,
+            companyName: companyName,
+            postBody: postBody,
+            isPublished: false,
+            publishedAt: null,
+            imageSrc1: imageSrc1,
+            imageSrc2: imageSrc2,
+            imageSrc3: imageSrc3,
+            approveLink: approveLink,
+            disapproveLink: disapproveLink,
+            editLink: editLink,
+        }
         // Record the post before sending email
-        const postRecorded = await s3BucketAndDynamoDB.writeDynamoDB();
+        const postRecorded = await s3BucketAndDynamoDB.writeDynamoDB(process.env.AWS_DYNAMODB_TABLE_NAME, post);
 
         // Check if the post was recorded successfully
         if (!postRecorded) {
@@ -456,7 +472,7 @@ module.exports.checkScheduleIdValidity = async (req, res) => {
 }
 
 module.exports.proxy = async (req, res) => {
-    // extract clientID from req.body
+
     const clientID = req.body.id
     console.log('clientID', clientID)
     const scheduleID = req.body.scheduleID
@@ -486,4 +502,106 @@ module.exports.proxy = async (req, res) => {
       } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
       }
+}
+
+module.exports.getFluxImage = async (req, res) => {
+    const imageUrls = []
+    const request = req.body
+    const clientID = request.clientID || 'no-client-id'
+    const bucketName = process.env.AWS_S3_BUCKET_NAME
+    console.log(`client_id: ${clientID}`)
+    const scheduleID = request.scheduleID || 'no-schedule-id'
+    console.log(`schedule_id: ${scheduleID}`)
+    const prompt = request.prompt
+    console.log(`prompt: ${prompt}`)
+    const seed = request.seed
+    console.log(`seed: ${seed}`)
+
+    const s3AndDynamoDB = new S3BucketAndDynamoDB(scheduleID, clientID)
+
+    // Initialize Replicate client
+    const replicate = new Replicate({
+        auth: process.env.REPLICATE_API_TOKEN,
+    })
+
+    // Prepare the input for the Flux model
+    const modelInput = {
+        prompt: prompt,
+        seed: seed || Math.floor(Math.random() * 1000000),
+        guidance: request.guidance || 3,
+        num_outputs: request.num_outputs || 3,
+        aspect_ratio: request.aspect_ratio || "1:1",
+        num_inference_steps: request.num_inference_steps || 28,
+        output_format: request.output_format || "webp",
+        output_quality: request.output_quality || 80,
+        go_fast: request.go_fast !== undefined ? request.go_fast : true,
+        megapixels: request.megapixels || "1",
+        disable_safety_checker: request.disable_safety_checker || false,
+    }
+
+    try {
+        // Run the Flux model
+        const output = await replicate.run(
+            "black-forest-labs/flux-dev",
+            { input: modelInput }
+        )
+
+        // The output is an array of image URLs
+        const replicateImageUrls = output
+
+        // Process and upload each image
+        for (let i = 0; i < replicateImageUrls.length; i++) {
+            const imageUrl = replicateImageUrls[i]
+            const randomNumber = Math.floor(Math.random() * 9000) + 1000 // 1000 to 9999
+            const imageKey = `img_${i}_${randomNumber}.png`
+            
+            console.log(`Generated image key: ${imageKey}`)
+
+            try {
+                // Download the image
+                const response = await fetch(imageUrl)
+                const imageBuffer = await response.arrayBuffer()
+
+                // Upload to S3
+                await s3AndDynamoDB.writeImageS3(imageKey, Buffer.from(imageBuffer))
+
+                const newImageUrl = `https://${bucketName}.s3.amazonaws.com/${clientID}/${scheduleID}/${imageKey}`
+                imageUrls.push(newImageUrl)
+                console.log(`Uploaded image to S3 with URL: ${newImageUrl}`)
+
+                // Save to DynamoDB
+                const imageID = `img_${i}_${randomNumber}`
+
+                const payload = {
+                    clientID: clientID,
+                    scheduleID: scheduleID,
+                    imageURL: newImageUrl,
+                    imageID: imageID,
+                    prompt: prompt,
+                    seed: seed,
+                    createdAt: new Date().toISOString()
+                }
+
+                await s3AndDynamoDB.writeImageDynamoDB(process.env.AWS_DYNAMODB_IMAGES_TABLE_NAME, payload)
+                console.log(`Saved image info to DynamoDB: ${imageID}`)
+
+            } catch (error) {
+                console.error(`Error processing image: ${error}`)
+                throw new Error('Error processing image')
+            }
+        }
+
+        // Return success response with image URLs
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ imageUrls: imageUrls }),
+        }
+
+    } catch (error) {
+        console.error('Error:', error)
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' }),
+        }
+    }
 }
