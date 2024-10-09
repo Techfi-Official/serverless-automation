@@ -587,21 +587,15 @@ module.exports.getFluxImage = async (req, res) => {
 
             } catch (error) {
                 console.error(`Error processing image: ${error}`)
-                throw new Error('Error processing image')
+                return res.status(500).json({ error: 'Error processing image' })
             }
         }
 
         // Return success response with image URLs
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ imageUrls: imageUrls }),
-        }
+        return res.status(200).json({ imageUrls: imageUrls })
 
     } catch (error) {
         console.error('Error:', error)
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Internal server error' }),
-        }
+        return res.status(500).json({ error: 'Internal server error' })
     }
 }
