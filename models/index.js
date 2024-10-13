@@ -80,7 +80,7 @@ class S3BucketAndDynamoDB {
     }
 
     async writeImageS3(imageKey, imageBuffer) {
-        return await writeS3BucketData(this.scheduleID, this.clientID, imageKey, imageBuffer)
+        return await writeS3BucketData(this.clientID, this.scheduleID, imageKey, imageBuffer)
     }
 
     async writeImageDynamoDB(tableName, item) {

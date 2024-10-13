@@ -9,11 +9,11 @@ const {
 } = require('@aws-sdk/client-s3')
 const { QueryCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
 
-async function writeS3BucketData(scheduleID, clientID, imageKey, data) {
+async function writeS3BucketData(clientID, scheduleID, imageKey, data) {
     // Create the PUT API params from our details
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: `${scheduleID}/${clientID}/${imageKey}`,
+        Key: `${clientID}/${scheduleID}/${imageKey}`,
         Body: data,
         ContentType: 'image/png',
     }
