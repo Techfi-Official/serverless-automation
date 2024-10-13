@@ -515,7 +515,7 @@ module.exports.getFluxImage = async (req, res) => {
         const bucketName = process.env.AWS_S3_BUCKET_NAME
         console.log(`client_id: ${clientID}`)
 
-        const scheduleID = request.scheduleID || 'no-schedule-id'
+        const scheduleID = String(request.scheduleID || 'no-schedule-id') // Convert to string
         console.log(`schedule_id: ${scheduleID}`)
 
         const prompt = request.prompt
@@ -577,7 +577,7 @@ module.exports.getFluxImage = async (req, res) => {
 
             const payload = {
                 clientID: clientID,
-                scheduleID: scheduleID,
+                scheduleID: String(scheduleID),
                 imageURL: newImageUrl,
                 imageID: imageID,
                 prompt: prompt,
