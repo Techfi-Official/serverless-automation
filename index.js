@@ -8,7 +8,9 @@ const axios = require('axios')
 const helmetConnect = require('./utils/connectionHelmet')
 require('dotenv').config()
 
-const PORT = process.env.PORT || 3000
+console.log('Starting server...');
+const PORT = process.env.PORT || 3000;
+console.log(`Attempting to start server on port ${PORT}`);
 // Set the view engine to EJS for templating
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))

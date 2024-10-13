@@ -505,41 +505,47 @@ module.exports.proxy = async (req, res) => {
 }
 
 module.exports.getFluxImage = async (req, res) => {
-    const imageUrls = []
-    const request = req.body
-    const clientID = request.clientID || 'no-client-id'
-    const bucketName = process.env.AWS_S3_BUCKET_NAME
-    console.log(`client_id: ${clientID}`)
-    const scheduleID = request.scheduleID || 'no-schedule-id'
-    console.log(`schedule_id: ${scheduleID}`)
-    const prompt = request.prompt
-    console.log(`prompt: ${prompt}`)
-    const seed = request.seed
-    console.log(`seed: ${seed}`)
-
-    const s3AndDynamoDB = new S3BucketAndDynamoDB(scheduleID, clientID)
-
-    // Initialize Replicate client
-    const replicate = new Replicate({
-        auth: process.env.REPLICATE_API_TOKEN,
-    })
-
-    // Prepare the input for the Flux model
-    const modelInput = {
-        prompt: prompt,
-        seed: seed || Math.floor(Math.random() * 1000000),
-        guidance: request.guidance || 3,
-        num_outputs: request.num_outputs || 3,
-        aspect_ratio: request.aspect_ratio || "1:1",
-        num_inference_steps: request.num_inference_steps || 28,
-        output_format: request.output_format || "webp",
-        output_quality: request.output_quality || 80,
-        go_fast: request.go_fast !== undefined ? request.go_fast : true,
-        megapixels: request.megapixels || "1",
-        disable_safety_checker: request.disable_safety_checker || false,
-    }
-
     try {
+        console.log('getFluxImage function called');
+        const request = req.body;
+
+        const imageUrls = []
+
+        const clientID = request.clientID || 'no-client-id'
+        const bucketName = process.env.AWS_S3_BUCKET_NAME
+        console.log(`client_id: ${clientID}`)
+
+        const scheduleID = request.scheduleID || 'no-schedule-id'
+        console.log(`schedule_id: ${scheduleID}`)
+
+        const prompt = request.prompt
+        console.log(`prompt: ${prompt}`)
+
+        const seed = request.seed
+        console.log(`seed: ${seed}`)
+
+        const s3AndDynamoDB = new S3BucketAndDynamoDB(scheduleID, clientID)
+
+        // Initialize Replicate client
+        const replicate = new Replicate({
+            auth: process.env.REPLICATE_API_TOKEN,
+        })
+
+        // Prepare the input for the Flux model
+        const modelInput = {
+            prompt: prompt,
+            seed: seed ? parseInt(seed, 10) : Math.floor(Math.random() * 1000000),
+            guidance: request.guidance || 3,
+            num_outputs: request.num_outputs || 3,
+            aspect_ratio: request.aspect_ratio || "1:1",
+            num_inference_steps: request.num_inference_steps || 28,
+            output_format: request.output_format || "webp",
+            output_quality: request.output_quality || 80,
+            go_fast: request.go_fast !== undefined ? request.go_fast : true,
+            megapixels: request.megapixels || "1",
+            disable_safety_checker: request.disable_safety_checker || false,
+        }
+
         // Run the Flux model
         const output = await replicate.run(
             "black-forest-labs/flux-dev",
@@ -554,48 +560,42 @@ module.exports.getFluxImage = async (req, res) => {
             const imageUrl = replicateImageUrls[i]
             const randomNumber = Math.floor(Math.random() * 9000) + 1000 // 1000 to 9999
             const imageKey = `img_${i}_${randomNumber}.png`
-            
-            console.log(`Generated image key: ${imageKey}`)
 
-            try {
-                // Download the image
-                const response = await fetch(imageUrl)
-                const imageBuffer = await response.arrayBuffer()
+            // Download the image
+            const response = await fetch(imageUrl)
+            const imageBuffer = await response.arrayBuffer()
 
-                // Upload to S3
-                await s3AndDynamoDB.writeImageS3(imageKey, Buffer.from(imageBuffer))
+            // Upload to S3
+            await s3AndDynamoDB.writeImageS3(imageKey, Buffer.from(imageBuffer))
 
-                const newImageUrl = `https://${bucketName}.s3.amazonaws.com/${clientID}/${scheduleID}/${imageKey}`
-                imageUrls.push(newImageUrl)
-                console.log(`Uploaded image to S3 with URL: ${newImageUrl}`)
+            const newImageUrl = `https://${bucketName}.s3.amazonaws.com/${clientID}/${scheduleID}/${imageKey}`
+            imageUrls.push(newImageUrl)
+            console.log(`Uploaded image to S3 with URL: ${newImageUrl}`)
 
-                // Save to DynamoDB
-                const imageID = `img_${i}_${randomNumber}`
+            // Save to DynamoDB
+            const imageID = `img_${i}_${randomNumber}`
 
-                const payload = {
-                    clientID: clientID,
-                    scheduleID: scheduleID,
-                    imageURL: newImageUrl,
-                    imageID: imageID,
-                    prompt: prompt,
-                    seed: seed,
-                    createdAt: new Date().toISOString()
-                }
-
-                await s3AndDynamoDB.writeImageDynamoDB(process.env.AWS_DYNAMODB_IMAGES_TABLE_NAME, payload)
-                console.log(`Saved image info to DynamoDB: ${imageID}`)
-
-            } catch (error) {
-                console.error(`Error processing image: ${error}`)
-                return res.status(500).json({ error: 'Error processing image' })
+            const payload = {
+                clientID: clientID,
+                scheduleID: scheduleID,
+                imageURL: newImageUrl,
+                imageID: imageID,
+                prompt: prompt,
+                seed: seed,
+                createdAt: new Date().toISOString()
             }
+            console.log(`Payload prepared:`, JSON.stringify(payload, null, 2))
+
+            await s3AndDynamoDB.writeImageDynamoDB(process.env.AWS_DYNAMODB_IMAGES_TABLE_NAME, payload)
+            console.log(`Successfully saved image info to DynamoDB: ${imageID}`)
         }
 
         // Return success response with image URLs
         return res.status(200).json({ imageUrls: imageUrls })
 
     } catch (error) {
-        console.error('Error:', error)
-        return res.status(500).json({ error: 'Internal server error' })
+        console.error('Error in getFluxImage:', error);
+        console.error('Error stack:', error.stack);
+        return res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 }
