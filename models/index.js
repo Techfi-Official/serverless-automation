@@ -72,7 +72,12 @@ class S3BucketAndDynamoDB {
     }
 
     writeDynamoDB(tableName, item) {
-        return writeDynamoDB(tableName, item)
+        // Ensure scheduleID is included in the item
+        const itemWithScheduleID = {
+            ...item,
+            scheduleID: this.scheduleID
+        };
+        return writeDynamoDB(tableName, itemWithScheduleID);
     }
 
     writePostDynamoDB(post) {
